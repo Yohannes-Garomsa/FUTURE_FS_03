@@ -1,0 +1,18 @@
+[
+    { "id": 1, "name": "Pancakes", "category": "breakfast", "price": "$10", "description": "Fluffy pancakes with syrup and berries.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 2, "name": "Eggs Benedict", "category": "breakfast", "price": "$12", "description": "Poached eggs on an English muffin with hollandaise sauce.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 3, "name": "Omelette", "category": "breakfast", "price": "$11", "description": "Three-egg omelette with your choice of fillings.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 4, "name": "French Toast", "category": "breakfast", "price": "$9", "description": "Thick slices of bread soaked in a sweet egg batter.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 5, "name": "Club Sandwich", "category": "lunch", "price": "$15", "description": "Triple-decker sandwich with turkey, bacon, lettuce, and tomato.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 6, "name": "Caesar Salad", "category": "lunch", "price": "$12", "description": "Romaine lettuce, croutons, and Parmesan cheese.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 7, "name": "Burger", "category": "lunch", "price": "$14", "description": "Juicy beef patty with all the fixings.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 8, "name": "Soup of the Day", "category": "lunch", "price": "$8", "description": "Ask your server for today's special.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 9, "name": "Steak Frites", "category": "dinner", "price": "$25", "description": "Grilled steak with a side of crispy fries.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 10, "name": "Spaghetti Carbonara", "category": "dinner", "price": "$18", "description": "Pasta with eggs, cheese, pancetta, and black pepper.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 11, "name": "Salmon", "category": "dinner", "price": "$22", "description": "Pan-seared salmon with a lemon-dill sauce.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 12, "name": "Risotto", "category": "dinner", "price": "$20", "description": "Creamy mushroom risotto.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 13, "name": "Margarita", "category": "drinks", "price": "$10", "description": "Tequila, lime juice, and triple sec.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 14, "name": "Old Fashioned", "category": "drinks", "price": "$12", "description": "Whiskey, sugar, bitters, and an orange peel.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 15, "name": "Soft Drink", "category": "drinks", "price": "$3", "description": "Coke, Diet Coke, Sprite, etc.", "image": "https://source.unsplash.com/random/300x200/?" },
+    { "id": 16, "name": "Coffee", "category": "drinks", "price": "$4", "description": "Freshly brewed coffee.", "image": "https://source.unsplash.com/random/300x200/?" }
+]
