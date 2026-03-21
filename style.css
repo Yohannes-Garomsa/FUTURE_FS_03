@@ -652,14 +652,7 @@ h3 {
 .section-head h2 {
   font-size: clamp(1.7rem, 6vw, 2.8rem);
   margin-bottom: 10px;
-  background: linear-gradient(
-    120deg,
-    color-mix(in oklab, var(--primary) 78%, var(--text) 22%),
-    color-mix(in oklab, var(--secondary) 78%, var(--text) 22%)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: color-mix(in oklab, var(--primary) 76%, var(--text) 24%);
 }
 
 .section-head p {
@@ -719,14 +712,27 @@ h3 {
 }
 
 .about-story h2 {
-  background: linear-gradient(
-    120deg,
-    color-mix(in oklab, var(--primary) 80%, var(--text) 20%),
-    color-mix(in oklab, var(--secondary) 86%, var(--text) 14%)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+  color: color-mix(in oklab, var(--primary) 78%, var(--text) 22%);
+}
+
+.about-story p {
+  color: color-mix(in oklab, var(--text) 86%, var(--muted) 14%);
+}
+
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .section-head h2 {
+    background: linear-gradient(120deg, #c57b37, #7a5a32);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .about-story h2 {
+    background: linear-gradient(120deg, #d89e4d, #8b5b29);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
 }
 
 .about-tags {
@@ -1812,6 +1818,14 @@ body.dark .hero-badges span {
   border-color: rgba(224, 154, 67, 0.45);
   background: rgba(18, 14, 10, 0.58);
   color: #f2d8ad;
+}
+
+body.dark .about-story h2 {
+  color: #f1b65a;
+}
+
+body.dark .about-story p {
+  color: #d8c29a;
 }
 
 body.dark .btn-primary {
