@@ -166,6 +166,24 @@ main > section {
     gap: 2rem;
 }
 
+.menu-message,
+.menu-error {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 1rem;
+    border-radius: 5px;
+}
+
+.menu-message {
+    background: var(--secondary-color);
+}
+
+.menu-error {
+    color: var(--error-color);
+    border: 1px solid var(--error-color);
+    background: rgba(231, 76, 60, 0.08);
+}
+
 .menu-item {
     background: var(--secondary-color);
     padding: 1.5rem;
