@@ -2,7 +2,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loader = document.querySelector('.loader');
     window.addEventListener('load', () => {
-        loader.style.display = 'none';
+        if (loader) {
+            loader.style.display = 'none';
+        }
     });
 
     // Mobile Navigation
@@ -136,6 +138,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 cart.length = 0;
                 updateCart();
                 cartModal.classList.add('hidden');
+            });
+
+            document.addEventListener('click', e => {
+                const clickedInsideCart = cartModal.contains(e.target);
+                const clickedCartIcon = cartIcon.contains(e.target);
+
+                if (!clickedInsideCart && !clickedCartIcon) {
+                    cartModal.classList.add('hidden');
+                }
             });
         });
 

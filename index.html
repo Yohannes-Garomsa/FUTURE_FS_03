@@ -1,162 +1,263 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="The Golden Spoon is a modern restaurant offering a unique dining experience.">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="The Golden Spoon is a modern restaurant offering a unique dining experience."
+    />
     <title>The Golden Spoon - Modern Dining</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap" rel="stylesheet">
-</head>
-<body>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div class="loader">
-        <div class="loader-inner"></div>
+      <div class="loader-inner"></div>
     </div>
 
     <header>
-        <nav>
-            <a href="#home" class="logo">The Golden Spoon</a>
-            <ul role="menubar">
-                <li role="none"><a href="#home" role="menuitem">Home</a></li>
-                <li role="none"><a href="#menu" role="menuitem">Menu</a></li>
-                <li role="none"><a href="#about" role="menuitem">About</a></li>
-                <li role="none"><a href="#reservations" role="menuitem">Reservations</a></li>
-                <li role="none"><a href="#contact" role="menuitem">Contact</a></li>
-            </ul>
-            <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </button>
-        </nav>
+      <nav>
+        <a href="#home" class="logo">The Golden Spoon</a>
+        <ul role="menubar">
+          <li role="none"><a href="#home" role="menuitem">Home</a></li>
+          <li role="none"><a href="#menu" role="menuitem">Menu</a></li>
+          <li role="none"><a href="#about" role="menuitem">About</a></li>
+          <li role="none">
+            <a href="#reservations" role="menuitem">Reservations</a>
+          </li>
+          <li role="none"><a href="#contact" role="menuitem">Contact</a></li>
+        </ul>
+        <button
+          class="hamburger"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+        >
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
+      </nav>
     </header>
 
     <main>
-        <section id="home" class="hero">
-            <div class="hero-content">
-                <h1>Welcome to The Golden Spoon</h1>
-                <p>Experience the taste of heaven.</p>
-                <a href="#reservations" class="btn">Book a Table</a>
-            </div>
-        </section>
+      <section id="home" class="hero">
+        <div class="hero-content">
+          <h1>Welcome to The Golden Spoon</h1>
+          <p>Experience the taste of heaven.</p>
+          <a href="#reservations" class="btn">Book a Table</a>
+        </div>
+      </section>
 
-        <section id="menu">
-            <h2>Our Menu</h2>
-            <div class="menu-filters" role="tablist">
-                <button role="tab" aria-selected="true" data-filter="all" class="active">All</button>
-                <button role="tab" aria-selected="false" data-filter="breakfast">Breakfast</button>
-                <button role="tab" aria-selected="false" data-filter="lunch">Lunch</button>
-                <button role="tab" aria-selected="false" data-filter="dinner">Dinner</button>
-                <button role="tab" aria-selected="false" data-filter="drinks">Drinks</button>
-            </div>
-            <div class="menu-items">
-                </div>
-        </section>
+      <section id="menu">
+        <h2>Our Menu</h2>
+        <div class="menu-filters" role="tablist">
+          <button
+            role="tab"
+            aria-selected="true"
+            data-filter="all"
+            class="active"
+          >
+            All
+          </button>
+          <button role="tab" aria-selected="false" data-filter="breakfast">
+            Breakfast
+          </button>
+          <button role="tab" aria-selected="false" data-filter="lunch">
+            Lunch
+          </button>
+          <button role="tab" aria-selected="false" data-filter="dinner">
+            Dinner
+          </button>
+          <button role="tab" aria-selected="false" data-filter="drinks">
+            Drinks
+          </button>
+        </div>
+        <div class="menu-items"></div>
+      </section>
 
-        <section id="about">
-            <h2>About Us</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <h3>Our Story</h3>
-                    <p>The Golden Spoon was founded in 2024 with a passion for creating unforgettable dining experiences. Our mission is to serve delicious, high-quality food in a warm and inviting atmosphere.</p>
-                    <h3>Meet the Chef</h3>
-                    <p>Our head chef, Jane Doe, has over 15 years of experience in the culinary world. She is passionate about using fresh, local ingredients to create innovative and flavorful dishes.</p>
-                </div>
-                <div class="about-images">
-                    <img src="https://source.unsplash.com/random/300x300/?restaurant" alt="Interior of The Golden Spoon restaurant">
-                    <img src="https://source.unsplash.com/random/300x300/?chef" alt="Head Chef Jane Doe in the kitchen">
-                </div>
-            </div>
-        </section>
+      <section id="about">
+        <h2>About Us</h2>
+        <div class="about-content">
+          <div class="about-text">
+            <h3>Our Story</h3>
+            <p>
+              The Golden Spoon was founded in 2024 with a passion for creating
+              unforgettable dining experiences. Our mission is to serve
+              delicious, high-quality food in a warm and inviting atmosphere.
+            </p>
+            <h3>Meet the Chef</h3>
+            <p>
+              Our head chef, Jane Doe, has over 15 years of experience in the
+              culinary world. She is passionate about using fresh, local
+              ingredients to create innovative and flavorful dishes.
+            </p>
+          </div>
+          <div class="about-images">
+            <img
+              src="https://source.unsplash.com/random/300x300/?restaurant"
+              alt="Interior of The Golden Spoon restaurant"
+            />
+            <img
+              src="https://source.unsplash.com/random/300x300/?chef"
+              alt="Head Chef Jane Doe in the kitchen"
+            />
+          </div>
+        </div>
+      </section>
 
-        <section id="reservations">
-            <h2>Book a Table</h2>
-            <form id="reservation-form" novalidate>
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input type="text" id="name" name="name" required aria-required="true">
-                    <p class="error-message" aria-live="polite"></p>
-                </div>
-                <div class="form-group">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="email" required aria-required="true">
-                    <p class="error-message" aria-live="polite"></p>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone</label>
-                    <input type="tel" id="phone" name="phone" required aria-required="true">
-                    <p class="error-message" aria-live="polite"></p>
-                </div>
-                <div class="form-group">
-                    <label for="date">Date & Time</label>
-                    <input type="datetime-local" id="date" name="date" required aria-required="true">
-                    <p class="error-message" aria-live="polite"></p>
-                </div>
-                <div class="form-group">
-                    <label for="guests">Number of Guests</label>
-                    <input type="number" id="guests" name="guests" min="1" required aria-required="true">
-                    <p class="error-message" aria-live="polite"></p>
-                </div>
-                <button type="submit" class="btn">Book Now</button>
+      <section id="reservations">
+        <h2>Book a Table</h2>
+        <form id="reservation-form" novalidate>
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              required
+              aria-required="true"
+            />
+            <p class="error-message" aria-live="polite"></p>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              required
+              aria-required="true"
+            />
+            <p class="error-message" aria-live="polite"></p>
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone</label>
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              required
+              aria-required="true"
+            />
+            <p class="error-message" aria-live="polite"></p>
+          </div>
+          <div class="form-group">
+            <label for="date">Date & Time</label>
+            <input
+              type="datetime-local"
+              id="date"
+              name="date"
+              required
+              aria-required="true"
+            />
+            <p class="error-message" aria-live="polite"></p>
+          </div>
+          <div class="form-group">
+            <label for="guests">Number of Guests</label>
+            <input
+              type="number"
+              id="guests"
+              name="guests"
+              min="1"
+              required
+              aria-required="true"
+            />
+            <p class="error-message" aria-live="polite"></p>
+          </div>
+          <button type="submit" class="btn">Book Now</button>
+        </form>
+        <div id="reservation-success" class="hidden" aria-live="polite">
+          <p>Your reservation has been successfully submitted!</p>
+        </div>
+      </section>
+
+      <section id="contact">
+        <h2>Contact Us</h2>
+        <div class="contact-content">
+          <div class="contact-form">
+            <form id="contact-form" novalidate>
+              <div class="form-group">
+                <label for="contact-name">Name</label>
+                <input
+                  type="text"
+                  id="contact-name"
+                  name="contact-name"
+                  required
+                  aria-required="true"
+                />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+              <div class="form-group">
+                <label for="contact-email">Email</label>
+                <input
+                  type="email"
+                  id="contact-email"
+                  name="contact-email"
+                  required
+                  aria-required="true"
+                />
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+              <div class="form-group">
+                <label for="message">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  rows="5"
+                  required
+                  aria-required="true"
+                ></textarea>
+                <p class="error-message" aria-live="polite"></p>
+              </div>
+              <button type="submit" class="btn">Send Message</button>
             </form>
-            <div id="reservation-success" class="hidden" aria-live="polite">
-                <p>Your reservation has been successfully submitted!</p>
-            </div>
-        </section>
+          </div>
+          <div class="contact-info">
+            <h3>Our Address</h3>
+            <address>
+              123 Main Street<br />
+              Anytown, USA
+            </address>
+            <h3>Phone</h3>
+            <p><a href="tel:555-555-5555">(555) 555-5555</a></p>
+            <h3>Email</h3>
+            <p>
+              <a href="mailto:info@thegoldenspoon.com"
+                >info@thegoldenspoon.com</a
+              >
+            </p>
+          </div>
+        </div>
+        <div class="map">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.257297884523!2d-73.985664784593!3d40.758895979326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c648357b%3A0x833a6c6a2894a7d2!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1678886"
+            width="600"
+            height="450"
+            style="border: 0"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Google Maps location of Times Square"
+          ></iframe>
+        </div>
+      </section>
 
-        <section id="contact">
-            <h2>Contact Us</h2>
-            <div class="contact-content">
-                <div class="contact-form">
-                    <form id="contact-form" novalidate>
-                        <div class="form-group">
-                            <label for="contact-name">Name</label>
-                            <input type="text" id="contact-name" name="contact-name" required aria-required="true">
-                            <p class="error-message" aria-live="polite"></p>
-                        </div>
-                        <div class="form-group">
-                            <label for="contact-email">Email</label>
-                            <input type="email" id="contact-email" name="contact-email" required aria-required="true">
-                            <p class="error-message" aria-live="polite"></p>
-                        </div>
-                        <div class="form-group">
-                            <label for="message">Message</label>
-                            <textarea id="message" name="message" rows="5" required aria-required="true"></textarea>
-                            <p class="error-message" aria-live="polite"></p>
-                        </div>
-                        <button type="submit" class="btn">Send Message</button>
-                    </form>
-                </div>
-                <div class="contact-info">
-                    <h3>Our Address</h3>
-                    <address>
-                        123 Main Street<br>
-                        Anytown, USA
-                    </address>
-                    <h3>Phone</h3>
-                    <p><a href="tel:555-555-5555">(555) 555-5555</a></p>
-                    <h3>Email</h3>
-                    <p><a href="mailto:info@thegoldenspoon.com">info@thegoldenspoon.com</a></p>
-                </div>
-            </div>
-            <div class="map">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3022.257297884523!2d-73.985664784593!3d40.758895979326!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c25855c648357b%3A0x833a6c6a2894a7d2!2sTimes%20Square!5e0!3m2!1sen!2sus!4v1678886" width="600" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="Google Maps location of Times Square"></iframe>
-            </div>
-        </section>
-
-        <section id="reviews">
-            <h2>What Our Customers Say</h2>
-            <div class="reviews-slider" aria-live="polite">
-                </div>
-        </section>
+      <section id="reviews">
+        <h2>What Our Customers Say</h2>
+        <div class="reviews-slider" aria-live="polite"></div>
+      </section>
     </main>
 
     <footer>
-        <p>&copy; 2024 The Golden Spoon. All rights reserved.</p>
+      <p>&copy; 2024 The Golden Spoon. All rights reserved.</p>
     </footer>
 
     <script src="script.js" defer></script>
-</body>
+  </body>
 </html>

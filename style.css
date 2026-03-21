@@ -355,7 +355,7 @@ footer {
 
 .theme-switcher {
     position: fixed;
-    top: 100px;
+    bottom: 140px;
     right: 20px;
     background: var(--secondary-color);
     border: 1px solid var(--primary-color);
@@ -367,7 +367,7 @@ footer {
 
 .cart-icon {
     position: fixed;
-    top: 150px;
+    bottom: 80px;
     right: 20px;
     background: var(--secondary-color);
     border: 1px solid var(--primary-color);
@@ -379,24 +379,21 @@ footer {
 
 .cart-modal {
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    bottom: 140px;
+    right: 20px;
+    width: min(92vw, 420px);
     z-index: 1001;
 }
 
 .cart-modal-content {
     background: var(--body-bg);
     padding: 2rem;
-    border-radius: 5px;
-    width: 90%;
-    max-width: 500px;
+    border-radius: 8px;
+    width: 100%;
+    max-height: 70vh;
+    overflow-y: auto;
     position: relative;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.2);
 }
 
 .close-cart {
@@ -414,6 +411,11 @@ footer {
     display: flex;
     justify-content: space-between;
     margin-bottom: 1rem;
+}
+
+.cart-items {
+    max-height: 40vh;
+    overflow-y: auto;
 }
 
 .loader {
@@ -493,5 +495,27 @@ footer {
     .about-content,
     .contact-content {
         grid-template-columns: 1fr;
+    }
+
+    #scroll-to-top {
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .cart-icon {
+        right: 12px;
+        bottom: 72px;
+    }
+
+    .theme-switcher {
+        right: 12px;
+        bottom: 132px;
+    }
+
+    .cart-modal {
+        right: 12px;
+        left: 12px;
+        width: auto;
+        bottom: 132px;
     }
 }
