@@ -931,32 +931,38 @@
     }
   };
 
-  const renderReview = () => {
-    if (!dom.reviewsSlider) {
-      return;
-    }
-
-    const current = reviews[state.reviewIndex];
-    dom.reviewsSlider.innerHTML = `
-      <p>"${current.quote}"</p>
-      <p class="author">- ${current.author}</p>
-    `;
-    dom.reviewsSlider.classList.remove('is-swapping');
-    void dom.reviewsSlider.offsetWidth;
-    dom.reviewsSlider.classList.add('is-swapping');
-  };
-
   const initReviews = () => {
     if (!dom.reviewsSlider) {
       return;
     }
 
-    renderReview();
+    const reviewCards = reviews
+      .map(
+        review => `
+          <article class="review-item">
+            <p class="review-quote">"${review.quote}"</p>
+            <p class="author">- ${review.author}</p>
+          </article>
+        `
+      )
+      .join('');
 
-    window.setInterval(() => {
-      state.reviewIndex = (state.reviewIndex + 1) % reviews.length;
-      renderReview();
-    }, 5200);
+    dom.reviewsSlider.innerHTML = `
+      <div class="reviews-track">
+        ${reviewCards}
+        ${reviewCards}
+      </div>
+    `;
+
+    dom.reviewsSlider.setAttribute('aria-live', 'off');
+
+    const pauseMarquee = () => dom.reviewsSlider.classList.add('is-paused');
+    const resumeMarquee = () => dom.reviewsSlider.classList.remove('is-paused');
+
+    dom.reviewsSlider.addEventListener('mouseenter', pauseMarquee);
+    dom.reviewsSlider.addEventListener('mouseleave', resumeMarquee);
+    dom.reviewsSlider.addEventListener('focusin', pauseMarquee);
+    dom.reviewsSlider.addEventListener('focusout', resumeMarquee);
   };
 
   const initModalEvents = () => {
