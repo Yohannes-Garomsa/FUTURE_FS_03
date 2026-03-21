@@ -665,6 +665,22 @@ h3 {
   margin-inline: auto;
   display: grid;
   gap: var(--space-3);
+  position: relative;
+  isolation: isolate;
+}
+
+.about-shell::before {
+  content: '';
+  position: absolute;
+  inset: -12px -10px;
+  z-index: -1;
+  border-radius: calc(var(--radius-lg) + 10px);
+  background:
+    radial-gradient(circle at 14% 22%, color-mix(in oklab, var(--accent-soft) 64%, transparent), transparent 43%),
+    radial-gradient(circle at 86% 14%, color-mix(in oklab, var(--accent-cool) 58%, transparent), transparent 44%),
+    radial-gradient(circle at 52% 90%, color-mix(in oklab, var(--accent-rose) 52%, transparent), transparent 48%);
+  opacity: 0.42;
+  pointer-events: none;
 }
 
 .about-intro {
@@ -674,6 +690,27 @@ h3 {
 
 .about-story {
   height: 100%;
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--surface) 78%, var(--accent-soft) 22%),
+      color-mix(in oklab, var(--surface) 84%, var(--accent-cool) 16%)
+    );
+  border: 1px solid color-mix(in oklab, var(--line) 72%, var(--primary) 28%);
+  box-shadow:
+    0 16px 34px color-mix(in oklab, var(--primary) 16%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 52%, transparent);
+}
+
+.about-story h2 {
+  background: linear-gradient(
+    120deg,
+    color-mix(in oklab, var(--primary) 80%, var(--text) 20%),
+    color-mix(in oklab, var(--secondary) 86%, var(--text) 14%)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .about-tags {
@@ -688,9 +725,13 @@ h3 {
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
   font-weight: 700;
-  color: color-mix(in oklab, var(--text) 82%, var(--primary) 18%);
-  border: 1px solid color-mix(in oklab, var(--line) 74%, var(--primary) 26%);
-  background: color-mix(in oklab, var(--surface) 78%, var(--accent-soft) 22%);
+  color: color-mix(in oklab, var(--text) 74%, var(--primary) 26%);
+  border: 1px solid color-mix(in oklab, var(--line) 58%, var(--primary) 42%);
+  background: linear-gradient(
+    140deg,
+    color-mix(in oklab, var(--surface) 64%, var(--accent-soft) 36%),
+    color-mix(in oklab, var(--surface) 84%, var(--accent-cool) 16%)
+  );
 }
 
 .about-features {
@@ -701,11 +742,72 @@ h3 {
 .about-feature {
   padding: 20px;
   display: grid;
-  gap: 8px;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--line) 70%, var(--primary) 30%);
+  box-shadow:
+    0 12px 28px color-mix(in oklab, var(--primary) 10%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 44%, transparent);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.about-feature::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 3px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklab, var(--primary) 88%, white 12%),
+    color-mix(in oklab, var(--secondary) 86%, white 14%)
+  );
+}
+
+.about-feature:nth-child(1) {
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--surface) 76%, var(--accent-soft) 24%),
+      color-mix(in oklab, var(--surface) 90%, transparent)
+    );
+}
+
+.about-feature:nth-child(2) {
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--surface) 76%, var(--accent-cool) 24%),
+      color-mix(in oklab, var(--surface) 90%, transparent)
+    );
+}
+
+.about-feature:nth-child(3) {
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, var(--surface) 78%, var(--accent-rose) 22%),
+      color-mix(in oklab, var(--surface) 90%, transparent)
+    );
+}
+
+.about-feature:hover {
+  transform: translateY(-4px);
+  border-color: color-mix(in oklab, var(--primary) 48%, var(--line) 52%);
+  box-shadow:
+    0 18px 30px color-mix(in oklab, var(--primary) 14%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 42%, transparent);
 }
 
 .feature-kicker {
-  font-size: 0.74rem;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--line) 60%, var(--primary) 40%);
+  background: color-mix(in oklab, var(--surface) 70%, var(--accent-soft) 30%);
+  font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.09em;
   color: color-mix(in oklab, var(--primary) 84%, var(--text) 16%);
@@ -725,22 +827,33 @@ h3 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
+  background:
+    linear-gradient(
+      140deg,
+      color-mix(in oklab, var(--primary-strong) 54%, #0f1310 46%),
+      color-mix(in oklab, var(--secondary) 42%, #141c16 58%)
+    );
+  border: 1px solid color-mix(in oklab, var(--secondary) 40%, var(--line) 60%);
+  box-shadow:
+    0 20px 36px color-mix(in oklab, var(--secondary) 18%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 20%, transparent);
 }
 
 .stat-item {
-  padding: 8px 4px;
+  padding: 10px 8px;
   display: grid;
   gap: 4px;
+  border-left: 2px solid color-mix(in oklab, var(--accent-soft) 64%, transparent);
 }
 
 .stat-item strong {
   font-size: clamp(1.35rem, 2.4vw, 2rem);
   line-height: 1;
-  color: color-mix(in oklab, var(--primary) 76%, var(--secondary) 24%);
+  color: color-mix(in oklab, #fff8ef 82%, var(--accent-soft) 18%);
 }
 
 .stat-item span {
-  color: var(--muted);
+  color: color-mix(in oklab, #f3e8d9 70%, var(--accent-cool) 30%);
   font-weight: 600;
   font-size: 0.86rem;
 }
@@ -981,6 +1094,28 @@ h3 {
   width: 100%;
   height: 100%;
   min-height: 0;
+  border: 1px solid color-mix(in oklab, var(--line) 64%, var(--secondary) 36%);
+  box-shadow:
+    0 12px 24px color-mix(in oklab, var(--secondary) 14%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 30%, transparent);
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+
+.about-media img:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 18px 30px color-mix(in oklab, var(--secondary) 18%, transparent),
+    inset 0 1px 0 color-mix(in oklab, white 34%, transparent);
+}
+
+body.dark .about-stats {
+  background:
+    linear-gradient(
+      140deg,
+      color-mix(in oklab, var(--secondary) 44%, #0e1511 56%),
+      color-mix(in oklab, var(--primary-strong) 42%, #17120f 58%)
+    );
+  border-color: color-mix(in oklab, var(--line) 58%, var(--secondary) 42%);
 }
 
 .about-media img:first-child {
