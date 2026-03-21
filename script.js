@@ -109,19 +109,46 @@ document.addEventListener('DOMContentLoaded', () => {
         let lastFocusedElement = null;
 
         const showMenuMessage = (message, className = 'menu-message') => {
-            menuItemsContainer.innerHTML = `<p class="${className}">${message}</p>`;
+            menuItemsContainer.replaceChildren();
+            const messageElement = document.createElement('p');
+            messageElement.className = className;
+            messageElement.textContent = message;
+            menuItemsContainer.appendChild(messageElement);
         };
 
         const displayMenuItems = items => {
-            menuItemsContainer.innerHTML = items.map(item => `
-                <div class="menu-item" data-category="${item.category}" data-id="${item.id}">
-                    <img src="${item.image}" alt="${item.name}">
-                    <h3>${item.name}</h3>
-                    <p class="price">${item.price}</p>
-                    <p>${item.description}</p>
-                    <button type="button" class="add-to-cart-btn">Add to Cart</button>
-                </div>
-            `).join('');
+            menuItemsContainer.replaceChildren();
+
+            const cards = items.map(item => {
+                const menuCard = document.createElement('div');
+                menuCard.className = 'menu-item';
+                menuCard.dataset.category = item.category;
+                menuCard.dataset.id = String(item.id);
+
+                const image = document.createElement('img');
+                image.src = item.image;
+                image.alt = item.name;
+
+                const title = document.createElement('h3');
+                title.textContent = item.name;
+
+                const price = document.createElement('p');
+                price.className = 'price';
+                price.textContent = item.price;
+
+                const description = document.createElement('p');
+                description.textContent = item.description;
+
+                const addButton = document.createElement('button');
+                addButton.type = 'button';
+                addButton.className = 'add-to-cart-btn';
+                addButton.textContent = 'Add to Cart';
+
+                menuCard.append(image, title, price, description, addButton);
+                return menuCard;
+            });
+
+            menuItemsContainer.append(...cards);
         };
 
         const updateCart = () => {
@@ -132,17 +159,28 @@ document.addEventListener('DOMContentLoaded', () => {
             cartCount.textContent = cart.reduce((acc, item) => acc + item.quantity, 0);
 
             if (cart.length === 0) {
-                cartItemsContainer.innerHTML = '<p>Your cart is empty.</p>';
+                cartItemsContainer.replaceChildren();
+                const emptyMessage = document.createElement('p');
+                emptyMessage.textContent = 'Your cart is empty.';
+                cartItemsContainer.appendChild(emptyMessage);
                 cartTotal.textContent = '$0';
                 return;
             }
 
-            cartItemsContainer.innerHTML = cart.map(item => `
-                <div class="cart-item">
-                    <span>${item.name} (x${item.quantity})</span>
-                    <span>${formatCurrency(parsePrice(item.price) * item.quantity)}</span>
-                </div>
-            `).join('');
+            cartItemsContainer.replaceChildren();
+            cart.forEach(item => {
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+
+                const label = document.createElement('span');
+                label.textContent = `${item.name} (x${item.quantity})`;
+
+                const price = document.createElement('span');
+                price.textContent = formatCurrency(parsePrice(item.price) * item.quantity);
+
+                cartItem.append(label, price);
+                cartItemsContainer.appendChild(cartItem);
+            });
 
             const total = cart.reduce((acc, item) => acc + parsePrice(item.price) * item.quantity, 0);
             cartTotal.textContent = formatCurrency(total);
@@ -182,29 +220,56 @@ document.addEventListener('DOMContentLoaded', () => {
             cartToggleButton.setAttribute('aria-label', 'Open shopping cart');
             cartToggleButton.setAttribute('aria-haspopup', 'dialog');
             cartToggleButton.setAttribute('aria-expanded', 'false');
-            cartToggleButton.innerHTML = '🛒 <span class="cart-count">0</span>';
+
+            const cartEmoji = document.createElement('span');
+            cartEmoji.setAttribute('aria-hidden', 'true');
+            cartEmoji.textContent = '🛒 ';
+            const cartCountBadge = document.createElement('span');
+            cartCountBadge.className = 'cart-count';
+            cartCountBadge.textContent = '0';
+            cartToggleButton.append(cartEmoji, cartCountBadge);
             document.body.appendChild(cartToggleButton);
 
             cartModal = document.createElement('div');
             cartModal.className = 'cart-modal hidden';
             cartModal.setAttribute('role', 'dialog');
             cartModal.setAttribute('aria-label', 'Shopping cart');
-            cartModal.innerHTML = `
-                <div class="cart-modal-content">
-                    <button type="button" class="close-cart" aria-label="Close cart">&times;</button>
-                    <h2>Your Cart</h2>
-                    <div class="cart-items"></div>
-                    <p>Total: <span class="cart-total">$0</span></p>
-                    <button type="button" class="checkout-btn btn">Checkout</button>
-                </div>
-            `;
+
+            const cartModalContent = document.createElement('div');
+            cartModalContent.className = 'cart-modal-content';
+
+            const closeButton = document.createElement('button');
+            closeButton.type = 'button';
+            closeButton.className = 'close-cart';
+            closeButton.setAttribute('aria-label', 'Close cart');
+            closeButton.textContent = '×';
+
+            const title = document.createElement('h2');
+            title.textContent = 'Your Cart';
+
+            const itemsContainer = document.createElement('div');
+            itemsContainer.className = 'cart-items';
+
+            const totalText = document.createElement('p');
+            totalText.textContent = 'Total: ';
+            const totalAmount = document.createElement('span');
+            totalAmount.className = 'cart-total';
+            totalAmount.textContent = '$0';
+            totalText.appendChild(totalAmount);
+
+            const checkoutButton = document.createElement('button');
+            checkoutButton.type = 'button';
+            checkoutButton.className = 'checkout-btn btn';
+            checkoutButton.textContent = 'Checkout';
+
+            cartModalContent.append(closeButton, title, itemsContainer, totalText, checkoutButton);
+            cartModal.appendChild(cartModalContent);
             document.body.appendChild(cartModal);
 
             cartCount = cartToggleButton.querySelector('.cart-count');
             cartItemsContainer = cartModal.querySelector('.cart-items');
             cartTotal = cartModal.querySelector('.cart-total');
             closeCartButton = cartModal.querySelector('.close-cart');
-            const checkoutButton = cartModal.querySelector('.checkout-btn');
 
             menuItemsContainer.addEventListener('click', e => {
                 if (!e.target.classList.contains('add-to-cart-btn')) {
@@ -556,12 +621,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const displayReview = () => {
-            reviewsSlider.innerHTML = `
-                <div class="review active">
-                    <p>"${reviews[currentReview].text}"</p>
-                    <p class="author">- ${reviews[currentReview].author}</p>
-                </div>
-            `;
+            reviewsSlider.replaceChildren();
+
+            const reviewCard = document.createElement('div');
+            reviewCard.className = 'review active';
+
+            const reviewText = document.createElement('p');
+            reviewText.textContent = `"${reviews[currentReview].text}"`;
+
+            const reviewAuthor = document.createElement('p');
+            reviewAuthor.className = 'author';
+            reviewAuthor.textContent = `- ${reviews[currentReview].author}`;
+
+            reviewCard.append(reviewText, reviewAuthor);
+            reviewsSlider.appendChild(reviewCard);
         };
 
         displayReview();
@@ -575,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const initScrollToTop = () => {
         const scrollToTopBtn = document.createElement('button');
         scrollToTopBtn.type = 'button';
-        scrollToTopBtn.innerHTML = '&uarr;';
+        scrollToTopBtn.textContent = '↑';
         scrollToTopBtn.id = 'scroll-to-top';
         scrollToTopBtn.setAttribute('aria-label', 'Scroll to top');
         document.body.appendChild(scrollToTopBtn);
@@ -600,14 +673,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const themeSwitcher = document.createElement('button');
         themeSwitcher.type = 'button';
         themeSwitcher.className = 'theme-switcher';
-        themeSwitcher.innerHTML = '🌙';
+        themeSwitcher.textContent = '🌙';
         themeSwitcher.setAttribute('aria-label', 'Switch theme');
         themeSwitcher.setAttribute('aria-pressed', 'false');
         document.body.appendChild(themeSwitcher);
 
         themeSwitcher.addEventListener('click', () => {
             const isDarkMode = document.body.classList.toggle('dark-mode');
-            themeSwitcher.innerHTML = isDarkMode ? '☀️' : '🌙';
+            themeSwitcher.textContent = isDarkMode ? '☀️' : '🌙';
             themeSwitcher.setAttribute('aria-pressed', String(isDarkMode));
         });
     };
