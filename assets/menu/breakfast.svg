@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="700" viewBox="0 0 900 700" role="img" aria-label="Breakfast dish placeholder">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f9d59a" />
+      <stop offset="100%" stop-color="#e6984a" />
+    </linearGradient>
+  </defs>
+  <rect width="900" height="700" fill="url(#bg)" />
+  <circle cx="450" cy="330" r="175" fill="#fff7e8" opacity="0.92" />
+  <circle cx="450" cy="330" r="118" fill="#ffd27d" />
+  <ellipse cx="450" cy="330" rx="78" ry="60" fill="#f29c4b" />
+  <text x="50%" y="585" text-anchor="middle" font-family="Manrope, Arial, sans-serif" font-size="56" font-weight="700" fill="#5e3215">Breakfast</text>
+</svg>
