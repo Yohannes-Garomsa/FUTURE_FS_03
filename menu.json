@@ -1,18 +1,130 @@
 [
-  { "id": 1, "name": "Pancakes", "category": "breakfast", "price": "$10", "description": "Fluffy pancakes with syrup and berries.", "image": "assets/menu/breakfast.svg" },
-  { "id": 2, "name": "Eggs Benedict", "category": "breakfast", "price": "$12", "description": "Poached eggs on an English muffin with hollandaise sauce.", "image": "assets/menu/breakfast.svg" },
-  { "id": 3, "name": "Omelette", "category": "breakfast", "price": "$11", "description": "Three-egg omelette with your choice of fillings.", "image": "assets/menu/breakfast.svg" },
-  { "id": 4, "name": "French Toast", "category": "breakfast", "price": "$9", "description": "Thick slices of bread soaked in a sweet egg batter.", "image": "assets/menu/breakfast.svg" },
-  { "id": 5, "name": "Club Sandwich", "category": "lunch", "price": "$15", "description": "Triple-decker sandwich with turkey, bacon, lettuce, and tomato.", "image": "assets/menu/lunch.svg" },
-  { "id": 6, "name": "Caesar Salad", "category": "lunch", "price": "$12", "description": "Romaine lettuce, croutons, and Parmesan cheese.", "image": "assets/menu/lunch.svg" },
-  { "id": 7, "name": "Burger", "category": "lunch", "price": "$14", "description": "Juicy beef patty with all the fixings.", "image": "assets/menu/lunch.svg" },
-  { "id": 8, "name": "Soup of the Day", "category": "lunch", "price": "$8", "description": "Ask your server for today's special.", "image": "assets/menu/lunch.svg" },
-  { "id": 9, "name": "Steak Frites", "category": "dinner", "price": "$25", "description": "Grilled steak with a side of crispy fries.", "image": "assets/menu/dinner.svg" },
-  { "id": 10, "name": "Spaghetti Carbonara", "category": "dinner", "price": "$18", "description": "Pasta with eggs, cheese, pancetta, and black pepper.", "image": "assets/menu/dinner.svg" },
-  { "id": 11, "name": "Salmon", "category": "dinner", "price": "$22", "description": "Pan-seared salmon with a lemon-dill sauce.", "image": "assets/menu/dinner.svg" },
-  { "id": 12, "name": "Risotto", "category": "dinner", "price": "$20", "description": "Creamy mushroom risotto.", "image": "assets/menu/dinner.svg" },
-  { "id": 13, "name": "Margarita", "category": "drinks", "price": "$10", "description": "Tequila, lime juice, and triple sec.", "image": "assets/menu/drinks.svg" },
-  { "id": 14, "name": "Old Fashioned", "category": "drinks", "price": "$12", "description": "Whiskey, sugar, bitters, and an orange peel.", "image": "assets/menu/drinks.svg" },
-  { "id": 15, "name": "Soft Drink", "category": "drinks", "price": "$3", "description": "Coke, Diet Coke, Sprite, etc.", "image": "assets/menu/drinks.svg" },
-  { "id": 16, "name": "Coffee", "category": "drinks", "price": "$4", "description": "Freshly brewed coffee.", "image": "assets/menu/drinks.svg" }
+  {
+    "id": 1,
+    "name": "Pancakes",
+    "category": "breakfast",
+    "price": "$10",
+    "description": "Fluffy pancakes with syrup and berries.",
+    "image": "assets/menu/pancakes.jpeg"
+  },
+  {
+    "id": 2,
+    "name": "Eggs Benedict",
+    "category": "breakfast",
+    "price": "$12",
+    "description": "Poached eggs on an English muffin with hollandaise sauce.",
+    "image": "assets/menu/eggs-benedict.jpeg"
+  },
+  {
+    "id": 3,
+    "name": "Omelette",
+    "category": "breakfast",
+    "price": "$11",
+    "description": "Three-egg omelette with your choice of fillings.",
+    "image": "assets/menu/omelette.jpeg"
+  },
+  {
+    "id": 4,
+    "name": "French Toast",
+    "category": "breakfast",
+    "price": "$9",
+    "description": "Thick slices of bread soaked in a sweet egg batter.",
+    "image": "assets/menu/french-toast.jpeg"
+  },
+  {
+    "id": 5,
+    "name": "Club Sandwich",
+    "category": "lunch",
+    "price": "$15",
+    "description": "Triple-decker sandwich with turkey, bacon, lettuce, and tomato.",
+    "image": "assets/menu/club-sandwich.jpeg"
+  },
+  {
+    "id": 6,
+    "name": "Caesar Salad",
+    "category": "lunch",
+    "price": "$12",
+    "description": "Romaine lettuce, croutons, and Parmesan cheese.",
+    "image": "assets/menu/caesar-salad.jpeg"
+  },
+  {
+    "id": 7,
+    "name": "Burger",
+    "category": "lunch",
+    "price": "$14",
+    "description": "Juicy beef patty with all the fixings.",
+    "image": "assets/menu/burger.jpeg"
+  },
+  {
+    "id": 8,
+    "name": "Soup of the Day",
+    "category": "lunch",
+    "price": "$8",
+    "description": "Ask your server for today's special.",
+    "image": "assets/menu/caesar-salad.jpeg"
+  },
+  {
+    "id": 9,
+    "name": "Steak Frites",
+    "category": "dinner",
+    "price": "$25",
+    "description": "Grilled steak with a side of crispy fries.",
+    "image": "assets/menu/steak-frites.jpeg"
+  },
+  {
+    "id": 10,
+    "name": "Spaghetti Carbonara",
+    "category": "dinner",
+    "price": "$18",
+    "description": "Pasta with eggs, cheese, pancetta, and black pepper.",
+    "image": "assets/menu/spaghetti-carbonara.jpeg"
+  },
+  {
+    "id": 11,
+    "name": "Salmon",
+    "category": "dinner",
+    "price": "$22",
+    "description": "Pan-seared salmon with a lemon-dill sauce.",
+    "image": "assets/menu/salmon.jpeg"
+  },
+  {
+    "id": 12,
+    "name": "Risotto",
+    "category": "dinner",
+    "price": "$20",
+    "description": "Creamy mushroom risotto.",
+    "image": "assets/menu/risotto.jpeg"
+  },
+  {
+    "id": 13,
+    "name": "Margarita",
+    "category": "drinks",
+    "price": "$10",
+    "description": "Tequila, lime juice, and triple sec.",
+    "image": "assets/menu/margarita.jpeg"
+  },
+  {
+    "id": 14,
+    "name": "Old Fashioned",
+    "category": "drinks",
+    "price": "$12",
+    "description": "Whiskey, sugar, bitters, and an orange peel.",
+    "image": "assets/menu/old-fashioned.jpeg"
+  },
+  {
+    "id": 15,
+    "name": "Soft Drink",
+    "category": "drinks",
+    "price": "$3",
+    "description": "Coke, Diet Coke, Sprite, etc.",
+    "image": "assets/menu/soft-drink.jpeg"
+  },
+  {
+    "id": 16,
+    "name": "Coffee",
+    "category": "drinks",
+    "price": "$4",
+    "description": "Freshly brewed coffee.",
+    "image": "assets/menu/soft-drink.jpeg"
+  }
 ]

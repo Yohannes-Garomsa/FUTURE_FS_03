@@ -750,7 +750,7 @@
     renderSkeletonMenu(6);
 
     try {
-      const response = await fetch('menu.json', { cache: 'force-cache' });
+      const response = await fetch('menu.json', { cache: 'no-store' });
       if (!response.ok) {
         throw new Error(`Menu fetch failed with status ${response.status}`);
       }
