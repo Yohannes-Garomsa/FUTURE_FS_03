@@ -98,9 +98,10 @@ nav ul a {
 }
 
 nav ul a:hover,
-nav ul a:focus {
+nav ul a:focus-visible {
     color: var(--primary-color);
-    outline: none;
+    outline: 2px solid var(--primary-color);
+    outline-offset: 4px;
 }
 
 .hero {
@@ -132,6 +133,11 @@ nav ul a:focus {
     background: #a8763e;
 }
 
+.btn:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+}
+
 main > section {
     padding: 4rem 0;
     width: 90%;
@@ -158,6 +164,11 @@ main > section {
 .menu-filters button:hover {
     background: var(--primary-color);
     color: var(--light-color);
+}
+
+.menu-filters button:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
 }
 
 .menu-items {
@@ -275,6 +286,16 @@ form {
     display: block;
 }
 
+.form-success {
+    max-width: 600px;
+    margin: 1rem auto 0;
+    color: #1f7a3e;
+    border: 1px solid #1f7a3e;
+    background: rgba(31, 122, 62, 0.08);
+    border-radius: 5px;
+    padding: 0.9rem 1rem;
+}
+
 .hidden {
     display: none;
 }
@@ -371,6 +392,11 @@ footer {
     opacity: 0.8;
 }
 
+#scroll-to-top:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+}
+
 .theme-switcher {
     position: fixed;
     bottom: 140px;
@@ -380,7 +406,14 @@ footer {
     padding: 0.5rem;
     border-radius: 20px;
     cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
     z-index: 1000;
+}
+
+.theme-switcher:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
 }
 
 .cart-icon {
@@ -392,7 +425,14 @@ footer {
     padding: 0.5rem;
     border-radius: 50%;
     cursor: pointer;
+    font-size: 1.1rem;
+    line-height: 1;
     z-index: 1000;
+}
+
+.cart-icon:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
 }
 
 .cart-modal {

@@ -24,18 +24,17 @@
     <header>
       <nav>
         <a href="#home" class="logo">The Golden Spoon</a>
-        <ul role="menubar">
-          <li role="none"><a href="#home" role="menuitem">Home</a></li>
-          <li role="none"><a href="#menu" role="menuitem">Menu</a></li>
-          <li role="none"><a href="#about" role="menuitem">About</a></li>
-          <li role="none">
-            <a href="#reservations" role="menuitem">Reservations</a>
-          </li>
-          <li role="none"><a href="#contact" role="menuitem">Contact</a></li>
+        <ul id="primary-nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#reservations">Reservations</a></li>
+          <li><a href="#contact">Contact</a></li>
         </ul>
         <button
           class="hamburger"
           aria-label="Toggle menu"
+          aria-controls="primary-nav"
           aria-expanded="false"
         >
           <span class="bar"></span>
@@ -56,29 +55,31 @@
 
       <section id="menu">
         <h2>Our Menu</h2>
-        <div class="menu-filters" role="tablist">
+        <div class="menu-filters" role="tablist" aria-label="Filter menu categories">
           <button
+            type="button"
             role="tab"
             aria-selected="true"
+            aria-controls="menu-items"
             data-filter="all"
             class="active"
           >
             All
           </button>
-          <button role="tab" aria-selected="false" data-filter="breakfast">
+          <button type="button" role="tab" aria-selected="false" aria-controls="menu-items" data-filter="breakfast">
             Breakfast
           </button>
-          <button role="tab" aria-selected="false" data-filter="lunch">
+          <button type="button" role="tab" aria-selected="false" aria-controls="menu-items" data-filter="lunch">
             Lunch
           </button>
-          <button role="tab" aria-selected="false" data-filter="dinner">
+          <button type="button" role="tab" aria-selected="false" aria-controls="menu-items" data-filter="dinner">
             Dinner
           </button>
-          <button role="tab" aria-selected="false" data-filter="drinks">
+          <button type="button" role="tab" aria-selected="false" aria-controls="menu-items" data-filter="drinks">
             Drinks
           </button>
         </div>
-        <div class="menu-items"></div>
+        <div id="menu-items" class="menu-items"></div>
       </section>
 
       <section id="about">
@@ -172,7 +173,7 @@
           </div>
           <button type="submit" class="btn">Book Now</button>
         </form>
-        <div id="reservation-success" class="hidden" aria-live="polite">
+        <div id="reservation-success" class="hidden form-success" aria-live="polite">
           <p>Your reservation has been successfully submitted!</p>
         </div>
       </section>
@@ -217,6 +218,9 @@
               </div>
               <button type="submit" class="btn">Send Message</button>
             </form>
+            <div id="contact-success" class="hidden form-success" aria-live="polite">
+              <p>Thank you for your message. We will get back to you soon!</p>
+            </div>
           </div>
           <div class="contact-info">
             <h3>Our Address</h3>
