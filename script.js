@@ -33,6 +33,36 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const formatCurrency = value => `$${value.toFixed(2)}`;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const createRevealObserver = () => {
+        if (prefersReducedMotion || !('IntersectionObserver' in window)) {
+            return element => {
+                if (element) {
+                    element.classList.add('is-visible');
+                }
+            };
+        }
+
+        const observer = new IntersectionObserver((entries, currentObserver) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) {
+                    return;
+                }
+
+                entry.target.classList.add('is-visible');
+                currentObserver.unobserve(entry.target);
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+
+        return element => {
+            if (element) {
+                observer.observe(element);
+            }
+        };
+    };
+
+    const observeReveal = createRevealObserver();
 
     const initNavigation = () => {
         const hamburger = document.querySelector('.hamburger');
@@ -86,9 +116,31 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 e.preventDefault();
-                targetElement.scrollIntoView({ behavior: 'smooth' });
+                targetElement.scrollIntoView({ behavior: prefersReducedMotion ? 'auto' : 'smooth' });
             });
         });
+    };
+
+    const initScrollProgress = () => {
+        const progressBar = document.querySelector('.scroll-progress');
+        if (!progressBar) {
+            return;
+        }
+
+        const updateProgress = () => {
+            const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const progress = scrollableHeight > 0 ? window.scrollY / scrollableHeight : 0;
+            const clampedProgress = Math.min(Math.max(progress, 0), 1);
+            progressBar.style.transform = `scaleX(${clampedProgress})`;
+        };
+
+        updateProgress();
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        window.addEventListener('resize', updateProgress);
+    };
+
+    const initSectionReveal = () => {
+        document.querySelectorAll('.reveal-on-scroll').forEach(observeReveal);
     };
 
     const initMenuAndCart = () => {
@@ -121,13 +173,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const cards = items.map(item => {
                 const menuCard = document.createElement('div');
-                menuCard.className = 'menu-item';
+                menuCard.className = 'menu-item reveal-on-scroll';
                 menuCard.dataset.category = item.category;
                 menuCard.dataset.id = String(item.id);
 
                 const image = document.createElement('img');
                 image.src = item.image;
                 image.alt = item.name;
+                image.width = 900;
+                image.height = 700;
+                image.loading = 'lazy';
+                image.decoding = 'async';
 
                 const title = document.createElement('h3');
                 title.textContent = item.name;
@@ -149,6 +205,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             menuItemsContainer.append(...cards);
+            cards.forEach(observeReveal);
         };
 
         const updateCart = () => {
@@ -299,6 +356,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
 
                 updateCart();
+
+                if (cartToggleButton) {
+                    cartToggleButton.classList.remove('bump');
+                    void cartToggleButton.offsetWidth;
+                    cartToggleButton.classList.add('bump');
+                    setTimeout(() => {
+                        cartToggleButton.classList.remove('bump');
+                    }, 360);
+                }
+
+                const addButton = e.target;
+                addButton.classList.add('added');
+                addButton.textContent = 'Added';
+                addButton.disabled = true;
+
+                setTimeout(() => {
+                    addButton.textContent = 'Add to Cart';
+                    addButton.classList.remove('added');
+                    addButton.disabled = false;
+                }, 650);
             });
 
             cartToggleButton.addEventListener('click', () => {
@@ -415,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         showMenuMessage('Loading menu...');
 
-        fetch('menu.json')
+        fetch('menu.json', { cache: 'force-cache' })
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Menu request failed with status ${response.status}`);
@@ -673,21 +750,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const themeSwitcher = document.createElement('button');
         themeSwitcher.type = 'button';
         themeSwitcher.className = 'theme-switcher';
-        themeSwitcher.textContent = '🌙';
+        const savedTheme = storage.get('theme-preference', 'light');
+        const initialDarkMode = savedTheme === 'dark';
+
+        if (initialDarkMode) {
+            document.body.classList.add('dark-mode');
+        }
+
+        themeSwitcher.textContent = initialDarkMode ? '☀️' : '🌙';
         themeSwitcher.setAttribute('aria-label', 'Switch theme');
-        themeSwitcher.setAttribute('aria-pressed', 'false');
+        themeSwitcher.setAttribute('aria-pressed', String(initialDarkMode));
         document.body.appendChild(themeSwitcher);
 
         themeSwitcher.addEventListener('click', () => {
             const isDarkMode = document.body.classList.toggle('dark-mode');
             themeSwitcher.textContent = isDarkMode ? '☀️' : '🌙';
             themeSwitcher.setAttribute('aria-pressed', String(isDarkMode));
+            storage.set('theme-preference', isDarkMode ? 'dark' : 'light');
         });
     };
 
+    initScrollProgress();
     initNavigation();
     initSmoothScroll();
     initMenuAndCart();
+    initSectionReveal();
     initForms();
     initReviews();
     initScrollToTop();

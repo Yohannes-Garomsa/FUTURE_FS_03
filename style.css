@@ -53,6 +53,18 @@ main {
     overflow: hidden;
 }
 
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    z-index: 150;
+    transform-origin: 0 0;
+    transform: scaleX(0);
+    background: linear-gradient(90deg, var(--brand), var(--accent));
+}
+
 a {
     color: inherit;
     text-decoration: none;
@@ -77,6 +89,11 @@ h1, h2, h3 {
     margin: 0 auto;
     padding: 5.5rem 0;
     position: relative;
+}
+
+.section-shell:not(.hero) {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 780px;
 }
 
 section {
@@ -174,7 +191,7 @@ nav ul a:focus-visible {
     padding: 6.5rem min(7vw, 5rem);
     display: flex;
     align-items: center;
-    background: url('https://source.unsplash.com/random/1900x1300/?fine-dining,food') center/cover no-repeat;
+    background: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1900&q=72') center/cover no-repeat;
     position: relative;
     isolation: isolate;
 }
@@ -348,6 +365,10 @@ nav ul a:focus-visible {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
+.menu-item.reveal-on-scroll {
+    transition: transform 0.45s ease, opacity 0.45s ease, box-shadow 0.25s ease;
+}
+
 .menu-item:hover {
     transform: translateY(-4px);
     box-shadow: 0 20px 34px rgba(31, 18, 10, 0.18);
@@ -377,6 +398,18 @@ nav ul a:focus-visible {
     background: color-mix(in oklab, var(--accent) 80%, white);
     color: #f8f8f4;
     cursor: pointer;
+    transition: transform 0.2s ease, filter 0.2s ease, background 0.2s ease;
+}
+
+.add-to-cart-btn:hover,
+.add-to-cart-btn:focus-visible {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+    outline: none;
+}
+
+.add-to-cart-btn.added {
+    background: linear-gradient(135deg, var(--brand), var(--brand-deep));
 }
 
 .about-section {
@@ -655,6 +688,11 @@ footer {
     justify-content: center;
     gap: 0.22rem;
     cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.cart-icon.bump {
+    animation: cartPulse 0.35s ease;
 }
 
 .cart-modal {
@@ -729,6 +767,17 @@ footer {
     animation: rise 0.6s ease forwards;
 }
 
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.reveal-on-scroll.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.55s ease, transform 0.55s ease;
+}
+
 .hero-content > *:nth-child(1) { animation-delay: 0.05s; }
 .hero-content > *:nth-child(2) { animation-delay: 0.12s; }
 .hero-content > *:nth-child(3) { animation-delay: 0.2s; }
@@ -745,6 +794,31 @@ footer {
 @keyframes spin {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
+}
+
+@keyframes cartPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.12); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .hero-content > * {
+        opacity: 1;
+        transform: none;
+    }
+
+    .reveal-on-scroll {
+        opacity: 1;
+        transform: none;
+    }
 }
 
 @media (max-width: 920px) {

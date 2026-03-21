@@ -11,19 +11,26 @@
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' https://source.unsplash.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; frame-src https://www.google.com https://www.google.com/maps; base-uri 'self'; form-action 'self';"
+      content="default-src 'self'; img-src 'self' https://source.unsplash.com https://images.unsplash.com data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; frame-src https://www.google.com https://www.google.com/maps; base-uri 'self'; form-action 'self';"
     />
     <title>The Golden Spoon | Modern Dining Experience</title>
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      rel="preload"
+      as="image"
+      href="https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1900&q=72"
+    />
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preconnect" href="https://images.unsplash.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
+    <div class="scroll-progress" aria-hidden="true"></div>
     <div class="loader" aria-hidden="true">
       <div class="loader-inner"></div>
     </div>
@@ -73,7 +80,7 @@
         </div>
       </section>
 
-      <section id="menu" class="section-shell">
+      <section id="menu" class="section-shell reveal-on-scroll">
         <div class="section-head">
           <p class="eyebrow">Our Kitchen</p>
           <h2>Signature Menu</h2>
@@ -94,7 +101,7 @@
         <div id="menu-items" class="menu-items"></div>
       </section>
 
-      <section id="about" class="section-shell about-section">
+      <section id="about" class="section-shell about-section reveal-on-scroll">
         <div class="section-head align-left">
           <p class="eyebrow">About Us</p>
           <h2>Built Around Hospitality</h2>
@@ -119,20 +126,26 @@
           </div>
           <div class="about-images">
             <img
-              src="https://source.unsplash.com/random/900x1000/?restaurant,interior"
+              src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=72"
               alt="Interior view of The Golden Spoon"
+              width="900"
+              height="1000"
               loading="lazy"
+              decoding="async"
             />
             <img
-              src="https://source.unsplash.com/random/900x1000/?chef,kitchen"
+              src="https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=900&q=72"
               alt="Chef preparing dishes in the kitchen"
+              width="900"
+              height="1000"
               loading="lazy"
+              decoding="async"
             />
           </div>
         </div>
       </section>
 
-      <section id="reservations" class="section-shell split-section">
+      <section id="reservations" class="section-shell split-section reveal-on-scroll">
         <div class="split-intro">
           <p class="eyebrow">Book a Table</p>
           <h2>Reserve Your Next Experience</h2>
@@ -182,7 +195,7 @@
         </div>
       </section>
 
-      <section id="contact" class="section-shell split-section">
+      <section id="contact" class="section-shell split-section reveal-on-scroll">
         <div class="split-intro">
           <p class="eyebrow">Contact</p>
           <h2>Let’s Plan Something Special</h2>
@@ -241,7 +254,7 @@
         </div>
       </section>
 
-      <section id="reviews" class="section-shell reviews-section">
+      <section id="reviews" class="section-shell reviews-section reveal-on-scroll">
         <div class="section-head">
           <p class="eyebrow">Guest Stories</p>
           <h2>What Our Guests Say</h2>
