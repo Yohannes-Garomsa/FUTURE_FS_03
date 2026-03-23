@@ -559,7 +559,9 @@
     dom.receiptServiceType.textContent = toTitleCase(order.serviceType);
     dom.receiptCustomerName.textContent = order.customerName;
     dom.receiptPhone.textContent = order.phone;
-    dom.receiptReadyAt.textContent = order.readyAt ? formatClockTime(order.readyAt) : order.readyLabel;
+    dom.receiptReadyAt.textContent = order.readyAt
+      ? formatClockTime(order.readyAt)
+      : order.readyLabel || 'Estimate unavailable';
     dom.receiptNotes.textContent = order.notes || 'No notes provided.';
 
     const fragment = document.createDocumentFragment();
@@ -677,8 +679,42 @@
   };
 
   const getOpenModal = () => {
-    const openModalEl = document.querySelector('.modal.open');
+    const openModals = Array.from(document.querySelectorAll('.modal.open'));
+    const openModalEl = openModals[openModals.length - 1];
     return openModalEl instanceof HTMLElement ? openModalEl : null;
+  };
+
+  const getModalType = modal => {
+    if (modal === dom.cartModal) {
+      return 'cart';
+    }
+
+    if (modal === dom.previewModal) {
+      return 'preview';
+    }
+
+    if (modal === dom.reviewModal) {
+      return 'review';
+    }
+
+    if (modal === dom.receiptModal) {
+      return 'receipt';
+    }
+
+    return '';
+  };
+
+  const isRestorableFocusTarget = target => {
+    if (!(target instanceof HTMLElement) || !document.contains(target)) {
+      return false;
+    }
+
+    const ownerModal = target.closest('.modal');
+    if (ownerModal instanceof HTMLElement && !ownerModal.classList.contains('open')) {
+      return false;
+    }
+
+    return target.getClientRects().length > 0;
   };
 
   const openModal = type => {
@@ -726,7 +762,7 @@
     if (type === 'cart' && dom.floatingCartBtn) {
       dom.floatingCartBtn.setAttribute('aria-expanded', 'false');
       if (restoreFocus) {
-        if (returnFocusTarget instanceof HTMLElement) {
+        if (isRestorableFocusTarget(returnFocusTarget)) {
           returnFocusTarget.focus();
         } else {
           dom.floatingCartBtn.focus();
@@ -735,7 +771,7 @@
     }
 
     if (type === 'review' && restoreFocus && dom.floatingCartBtn) {
-      if (returnFocusTarget instanceof HTMLElement) {
+      if (isRestorableFocusTarget(returnFocusTarget)) {
         returnFocusTarget.focus();
       } else {
         dom.floatingCartBtn.focus();
@@ -743,7 +779,7 @@
     }
 
     if (type === 'receipt' && restoreFocus && dom.floatingCartBtn) {
-      if (returnFocusTarget instanceof HTMLElement) {
+      if (isRestorableFocusTarget(returnFocusTarget)) {
         returnFocusTarget.focus();
       } else {
         dom.floatingCartBtn.focus();
@@ -1936,24 +1972,18 @@
         return;
       }
 
-      if (dom.reviewModal && dom.reviewModal.classList.contains('open')) {
-        if (state.isSubmittingOrder) {
-          return;
-        }
-        closeModal('review');
+      if (!openModal) {
+        return;
+      }
+
+      const openType = getModalType(openModal);
+      if (openType === 'review' && state.isSubmittingOrder) {
+        return;
+      }
+
+      closeModal(openType);
+      if (openType === 'review') {
         saveCheckoutDraft();
-      }
-
-      if (dom.receiptModal && dom.receiptModal.classList.contains('open')) {
-        closeModal('receipt');
-      }
-
-      if (dom.previewModal && dom.previewModal.classList.contains('open')) {
-        closeModal('preview');
-      }
-
-      if (dom.cartModal && dom.cartModal.classList.contains('open')) {
-        closeModal('cart');
       }
     });
 
@@ -2038,6 +2068,9 @@
         }
 
         renderReceipt(order);
+        if (dom.cartModal && dom.cartModal.classList.contains('open')) {
+          closeModal('cart', { restoreFocus: false });
+        }
         openModal('receipt');
       });
     }
