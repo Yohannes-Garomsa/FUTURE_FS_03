@@ -7,7 +7,8 @@
     reservations: 'golden-spoon-reservations-v1',
     checkoutDraft: 'golden-spoon-checkout-draft-v1',
     submitLock: 'golden-spoon-submit-lock-v1',
-    recentOrder: 'golden-spoon-recent-order-v1'
+    recentOrder: 'golden-spoon-recent-order-v1',
+    orders: 'golden-spoon-orders-v1'
   };
 
   const SERVICE_RATE = 0.1;
@@ -25,7 +26,9 @@
     previewQty: 1,
     reviewIndex: 0,
     isSubmittingOrder: false,
-    shouldRestoreReview: false
+    shouldRestoreReview: false,
+    orderHistory: [],
+    activeReceipt: null
   };
 
   const reviews = [
@@ -53,6 +56,11 @@
     style: 'currency',
     currency: 'USD',
     maximumFractionDigits: 2
+  });
+
+  const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
   });
 
   const storage = {
@@ -131,6 +139,15 @@
     }
 
     dom.checkoutDraftStatus.textContent = message;
+  };
+
+  const formatOrderDate = value => {
+    const ts = typeof value === 'number' ? value : Date.parse(String(value));
+    if (Number.isNaN(ts)) {
+      return 'Unknown time';
+    }
+
+    return dateTimeFormatter.format(ts);
   };
 
   const clearExpiredOrderGuards = () => {
@@ -308,6 +325,165 @@
     return changed;
   };
 
+  const getStoredOrders = () => {
+    const saved = storage.get(STORAGE_KEYS.orders, []);
+    if (!Array.isArray(saved)) {
+      return [];
+    }
+
+    return saved.filter(order => order && typeof order === 'object');
+  };
+
+  const saveOrderHistory = orders => {
+    state.orderHistory = orders;
+    storage.set(STORAGE_KEYS.orders, orders);
+  };
+
+  const generateOrderNumber = timestamp => {
+    const date = new Date(timestamp);
+    const y = String(date.getFullYear());
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    const suffix = String(timestamp).slice(-4);
+
+    return `GS-${y}${m}${d}-${suffix}`;
+  };
+
+  const toTitleCase = value =>
+    String(value || '')
+      .split('-')
+      .map(part => (part ? part[0].toUpperCase() + part.slice(1) : ''))
+      .join(' ');
+
+  const buildOrderRecord = checkoutData => {
+    const placedAt = Date.now();
+    const totals = getCartTotals();
+
+    return {
+      orderNumber: generateOrderNumber(placedAt),
+      placedAt,
+      customerName: checkoutData.customerName,
+      phone: checkoutData.phone,
+      serviceType: checkoutData.serviceType,
+      notes: checkoutData.notes,
+      items: state.cart.map(item => ({
+        id: item.id,
+        name: item.name,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        lineTotal: item.unitPrice * item.quantity
+      })),
+      subtotal: totals.subtotal,
+      service: totals.service,
+      total: totals.total
+    };
+  };
+
+  const persistOrder = order => {
+    const nextOrders = [order, ...getStoredOrders()].slice(0, 6);
+    saveOrderHistory(nextOrders);
+  };
+
+  const renderOrderHistory = () => {
+    if (!dom.orderHistoryList) {
+      return;
+    }
+
+    if (!state.orderHistory.length) {
+      dom.orderHistoryList.innerHTML =
+        '<div class="history-empty"><p>No demo orders yet. Confirm one to see it here.</p></div>';
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    state.orderHistory.forEach(order => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'history-card';
+      button.dataset.orderNumber = order.orderNumber;
+
+      const copy = document.createElement('div');
+      copy.className = 'history-card-copy';
+
+      const title = document.createElement('strong');
+      title.textContent = order.orderNumber;
+
+      const meta = document.createElement('p');
+      meta.className = 'history-card-meta';
+      meta.textContent = `${toTitleCase(order.serviceType)} • ${formatOrderDate(order.placedAt)}`;
+
+      const customer = document.createElement('p');
+      customer.className = 'history-card-meta';
+      customer.textContent = `${order.customerName} • ${formatMoney(order.total)}`;
+
+      const action = document.createElement('span');
+      action.className = 'history-card-action';
+      action.textContent = 'View receipt';
+
+      copy.append(title, meta, customer);
+      button.append(copy, action);
+      fragment.appendChild(button);
+    });
+
+    dom.orderHistoryList.replaceChildren(fragment);
+  };
+
+  const renderReceipt = order => {
+    if (
+      !order ||
+      !dom.receiptOrderNumber ||
+      !dom.receiptPlacedAt ||
+      !dom.receiptServiceType ||
+      !dom.receiptCustomerName ||
+      !dom.receiptPhone ||
+      !dom.receiptNotes ||
+      !dom.receiptItems ||
+      !dom.receiptSubtotal ||
+      !dom.receiptService ||
+      !dom.receiptTotal
+    ) {
+      return;
+    }
+
+    state.activeReceipt = order;
+
+    dom.receiptOrderNumber.textContent = order.orderNumber;
+    dom.receiptPlacedAt.textContent = formatOrderDate(order.placedAt);
+    dom.receiptServiceType.textContent = toTitleCase(order.serviceType);
+    dom.receiptCustomerName.textContent = order.customerName;
+    dom.receiptPhone.textContent = order.phone;
+    dom.receiptNotes.textContent = order.notes || 'No notes provided.';
+
+    const fragment = document.createDocumentFragment();
+    order.items.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'receipt-item-row';
+
+      const copy = document.createElement('div');
+      copy.className = 'receipt-item-copy';
+
+      const name = document.createElement('strong');
+      name.textContent = item.name;
+
+      const meta = document.createElement('p');
+      meta.className = 'receipt-item-meta';
+      meta.textContent = `${item.quantity} x ${formatMoney(item.unitPrice)}`;
+
+      const total = document.createElement('strong');
+      total.textContent = formatMoney(item.lineTotal);
+
+      copy.append(name, meta);
+      row.append(copy, total);
+      fragment.appendChild(row);
+    });
+
+    dom.receiptItems.replaceChildren(fragment);
+    dom.receiptSubtotal.textContent = formatMoney(order.subtotal);
+    dom.receiptService.textContent = formatMoney(order.service);
+    dom.receiptTotal.textContent = formatMoney(order.total);
+  };
+
   const saveCart = () => {
     storage.set(STORAGE_KEYS.cart, state.cart);
   };
@@ -349,6 +525,10 @@
       return dom.reviewModal;
     }
 
+    if (type === 'receipt') {
+      return dom.receiptModal;
+    }
+
     return null;
   };
 
@@ -373,6 +553,10 @@
     if (type === 'review' && dom.reviewConfirmBtn) {
       dom.reviewConfirmBtn.focus();
     }
+
+    if (type === 'receipt' && dom.receiptDoneBtn) {
+      dom.receiptDoneBtn.focus();
+    }
   };
 
   const closeModal = (type, { restoreFocus = true } = {}) => {
@@ -393,6 +577,10 @@
     }
 
     if (type === 'review' && restoreFocus && dom.floatingCartBtn) {
+      dom.floatingCartBtn.focus();
+    }
+
+    if (type === 'receipt' && restoreFocus && dom.floatingCartBtn) {
       dom.floatingCartBtn.focus();
     }
   };
@@ -1415,11 +1603,15 @@
 
         const selectedService = serviceInputs.find(radio => radio.checked);
         const serviceLabel = selectedService ? selectedService.value : 'pickup';
+        const orderRecord = buildOrderRecord(checkoutData);
 
         window.setTimeout(() => {
           state.isSubmittingOrder = false;
           clearSubmitLock();
           rememberRecentOrder(fingerprint);
+          persistOrder(orderRecord);
+          renderOrderHistory();
+          renderReceipt(orderRecord);
           state.cart = [];
           saveCart();
           renderCart();
@@ -1427,8 +1619,9 @@
           resetFormValidation(dom.checkoutForm);
           clearCheckoutDraft();
           closeModal('review', { restoreFocus: false });
+          openModal('receipt');
           toast(
-            `Demo order for ${serviceLabel} confirmed locally. No payment was charged.`,
+            `Demo order ${orderRecord.orderNumber} for ${serviceLabel} confirmed locally. No payment was charged.`,
             'success'
           );
         }, 700);
@@ -1486,7 +1679,7 @@
         return;
       }
 
-      if (type === 'cart' || type === 'preview' || type === 'review') {
+      if (type === 'cart' || type === 'preview' || type === 'review' || type === 'receipt') {
         closeModal(type);
         if (type === 'review') {
           saveCheckoutDraft();
@@ -1505,6 +1698,10 @@
         }
         closeModal('review');
         saveCheckoutDraft();
+      }
+
+      if (dom.receiptModal && dom.receiptModal.classList.contains('open')) {
+        closeModal('receipt');
       }
 
       if (dom.previewModal && dom.previewModal.classList.contains('open')) {
@@ -1570,6 +1767,29 @@
       });
     }
 
+    if (dom.receiptDoneBtn) {
+      dom.receiptDoneBtn.addEventListener('click', () => {
+        closeModal('receipt');
+      });
+    }
+
+    if (dom.orderHistoryList) {
+      dom.orderHistoryList.addEventListener('click', event => {
+        const card = event.target.closest('[data-order-number]');
+        if (!card) {
+          return;
+        }
+
+        const order = state.orderHistory.find(entry => entry.orderNumber === card.dataset.orderNumber);
+        if (!order) {
+          return;
+        }
+
+        renderReceipt(order);
+        openModal('receipt');
+      });
+    }
+
   };
 
   const initDelegatedEvents = () => {
@@ -1628,6 +1848,20 @@
     dom.reviewTotal = select('#review-total');
     dom.reviewBackBtn = select('#review-back-btn');
     dom.reviewConfirmBtn = select('#review-confirm-btn');
+    dom.orderHistoryList = select('#order-history-list');
+
+    dom.receiptModal = select('#receipt-modal');
+    dom.receiptOrderNumber = select('#receipt-order-number');
+    dom.receiptPlacedAt = select('#receipt-placed-at');
+    dom.receiptServiceType = select('#receipt-service-type');
+    dom.receiptCustomerName = select('#receipt-customer-name');
+    dom.receiptPhone = select('#receipt-phone');
+    dom.receiptNotes = select('#receipt-notes');
+    dom.receiptItems = select('#receipt-items');
+    dom.receiptSubtotal = select('#receipt-subtotal');
+    dom.receiptService = select('#receipt-service');
+    dom.receiptTotal = select('#receipt-total');
+    dom.receiptDoneBtn = select('#receipt-done-btn');
 
     dom.toastContainer = select('#toast-container');
 
@@ -1641,6 +1875,8 @@
     cacheDom();
     clearExpiredOrderGuards();
     restoreCheckoutDraft();
+    state.orderHistory = getStoredOrders();
+    renderOrderHistory();
 
     initTheme();
     initHeaderAndScrollUI();

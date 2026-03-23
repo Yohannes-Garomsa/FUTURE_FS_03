@@ -468,6 +468,16 @@
           <strong>Demo mode:</strong> Review your order before confirming it.
           Online payment is not active on this site yet.
         </p>
+        <section class="order-history-shell" aria-labelledby="order-history-title">
+          <div class="history-head">
+            <div>
+              <p class="eyebrow">Saved Locally</p>
+              <h4 id="order-history-title">Recent Demo Orders</h4>
+            </div>
+            <p class="history-copy">Stored only in this browser.</p>
+          </div>
+          <div id="order-history-list" class="order-history-list"></div>
+        </section>
         <button id="checkout-btn" type="button" class="btn btn-primary full">
           Review Order
         </button>
@@ -603,6 +613,82 @@
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <div
+      id="receipt-modal"
+      class="modal"
+      aria-hidden="true"
+      role="dialog"
+      aria-label="Order receipt"
+    >
+      <div class="modal-backdrop" data-close-modal="receipt"></div>
+      <div class="modal-panel glass-card receipt-panel">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Order Confirmed</p>
+            <h3>Demo Receipt</h3>
+          </div>
+          <button
+            type="button"
+            class="icon-btn"
+            data-close-modal="receipt"
+            aria-label="Close receipt"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p id="receipt-order-number" class="receipt-order-number">GS-00000000-0000</p>
+
+        <div class="receipt-meta">
+          <div>
+            <span>Placed At</span>
+            <strong id="receipt-placed-at">-</strong>
+          </div>
+          <div>
+            <span>Service</span>
+            <strong id="receipt-service-type">-</strong>
+          </div>
+          <div>
+            <span>Customer</span>
+            <strong id="receipt-customer-name">-</strong>
+          </div>
+          <div>
+            <span>Phone</span>
+            <strong id="receipt-phone">-</strong>
+          </div>
+        </div>
+
+        <div id="receipt-notes-wrap" class="receipt-notes">
+          <span>Notes</span>
+          <p id="receipt-notes">No notes provided.</p>
+        </div>
+
+        <div id="receipt-items" class="receipt-items"></div>
+
+        <div class="cart-summary receipt-summary">
+          <div>
+            <span>Subtotal</span><strong id="receipt-subtotal">$0.00</strong>
+          </div>
+          <div>
+            <span>Service (10%)</span><strong id="receipt-service">$0.00</strong>
+          </div>
+          <div class="total-row">
+            <span>Total</span><strong id="receipt-total">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            id="receipt-done-btn"
+            type="button"
+            class="btn btn-primary"
+          >
+            Done
+          </button>
+        </div>
       </div>
     </div>
 
