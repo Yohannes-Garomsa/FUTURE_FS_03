@@ -1384,13 +1384,10 @@ form {
   z-index: 110;
   display: flex;
   align-items: center;
-  gap: 12px;
-}
-
-.floating-contact-links {
-  display: flex;
-  align-items: center;
   gap: 10px;
+  flex-wrap: nowrap;
+  width: max-content;
+  max-width: calc(100vw - 24px);
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
@@ -1402,6 +1399,20 @@ form {
     );
   backdrop-filter: blur(12px);
   box-shadow: var(--shadow-soft);
+}
+
+.floating-contact-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+.floating-action-divider {
+  width: 1px;
+  align-self: stretch;
+  background: color-mix(in oklab, var(--line) 78%, var(--primary) 22%);
+  opacity: 0.8;
 }
 
 .contact-fab {
@@ -1452,16 +1463,9 @@ form {
   gap: 8px;
   border: 1px solid var(--line);
   border-radius: var(--radius-pill);
-  background:
-    linear-gradient(
-      145deg,
-      color-mix(in oklab, var(--surface) 78%, var(--accent-soft) 22%),
-      color-mix(in oklab, var(--surface) 90%, var(--accent-cool) 10%)
-    );
-  backdrop-filter: blur(12px);
+  background: transparent;
   color: var(--text);
   padding: 10px 14px;
-  box-shadow: var(--shadow-soft);
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -2354,15 +2358,10 @@ body.dark .review-card .author {
 
 body.dark .floating-cart {
   border-color: color-mix(in oklab, var(--primary) 42%, var(--line) 58%);
-  background:
-    linear-gradient(
-      140deg,
-      color-mix(in oklab, #1a130d 84%, var(--primary-strong) 16%),
-      color-mix(in oklab, #1a140f 90%, var(--secondary) 10%)
-    );
+  background: transparent;
 }
 
-body.dark .floating-contact-links {
+body.dark .floating-action-stack {
   border-color: color-mix(in oklab, var(--primary) 38%, var(--line) 62%);
   background:
     linear-gradient(
@@ -2370,6 +2369,10 @@ body.dark .floating-contact-links {
       color-mix(in oklab, #18120c 84%, var(--primary-strong) 16%),
       color-mix(in oklab, #17120d 90%, var(--secondary) 10%)
     );
+}
+
+body.dark .floating-action-divider {
+  background: color-mix(in oklab, var(--primary) 42%, var(--line) 58%);
 }
 
 body.dark .scroll-top,
@@ -2599,11 +2602,11 @@ body.dark .site-footer {
 
   .floating-action-stack {
     gap: 10px;
+    padding: 7px 8px;
   }
 
   .floating-contact-links {
     gap: 8px;
-    padding: 7px 8px;
   }
 
   .contact-fab {
@@ -2624,15 +2627,15 @@ body.dark .site-footer {
 @media (max-width: 560px) {
   .floating-action-stack {
     right: 12px;
-    left: 12px;
+    left: auto;
     bottom: 72px;
-    justify-content: space-between;
-    gap: 8px;
+    gap: 7px;
+    padding: 6px 7px;
+    max-width: calc(100vw - 24px);
   }
 
   .floating-contact-links {
     gap: 6px;
-    padding: 6px;
   }
 
   .contact-fab {
