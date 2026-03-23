@@ -1613,6 +1613,59 @@ form {
   font-size: 0.85rem;
 }
 
+.checkout-status-card {
+  margin-bottom: var(--space-2);
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--surface) 94%, transparent);
+  display: grid;
+  gap: 8px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.status-badge.is-open {
+  color: #155d37;
+  background: rgba(55, 154, 95, 0.14);
+  border-color: rgba(41, 132, 80, 0.28);
+}
+
+.status-badge.is-closed {
+  color: #8d2d1d;
+  background: rgba(201, 79, 47, 0.12);
+  border-color: rgba(183, 69, 38, 0.24);
+}
+
+.status-hours,
+.status-copy {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.status-estimate {
+  font-weight: 700;
+  color: color-mix(in oklab, var(--primary) 72%, var(--text) 28%);
+}
+
 .order-history-shell {
   display: grid;
   gap: 12px;
@@ -2256,6 +2309,7 @@ body.dark .modal-panel {
 }
 
 body.dark .checkout-note,
+body.dark .checkout-status-card,
 body.dark .review-item-row,
 body.dark .review-empty,
 body.dark .history-card,
@@ -2298,13 +2352,31 @@ body.dark .history-card-meta,
 body.dark .receipt-item-meta,
 body.dark .receipt-notes p,
 body.dark .receipt-meta span,
-body.dark .receipt-notes span {
+body.dark .receipt-notes span,
+body.dark .status-hours,
+body.dark .status-copy {
   color: #c9b690;
 }
 
 body.dark .history-card-action,
 body.dark .receipt-order-number {
   color: #f2ba64;
+}
+
+body.dark .status-estimate {
+  color: #f0dcbb;
+}
+
+body.dark .status-badge.is-open {
+  color: #b6efca;
+  background: rgba(57, 149, 97, 0.18);
+  border-color: rgba(83, 181, 122, 0.3);
+}
+
+body.dark .status-badge.is-closed {
+  color: #ffc1b2;
+  background: rgba(183, 72, 46, 0.2);
+  border-color: rgba(206, 101, 77, 0.3);
 }
 
 body.dark .site-footer {

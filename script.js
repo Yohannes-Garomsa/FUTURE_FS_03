@@ -15,6 +15,10 @@
   const TOAST_DURATION = 2800;
   const SUBMIT_LOCK_MS = 5000;
   const RECENT_ORDER_WINDOW_MS = 15000;
+  const BUSINESS_HOURS = {
+    openHour: 8,
+    closeHour: 23
+  };
 
   const state = {
     menu: [],
@@ -60,6 +64,10 @@
 
   const dateTimeFormatter = new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+
+  const timeFormatter = new Intl.DateTimeFormat('en-US', {
     timeStyle: 'short'
   });
 
@@ -148,6 +156,97 @@
     }
 
     return dateTimeFormatter.format(ts);
+  };
+
+  const formatClockTime = value => {
+    const ts = value instanceof Date ? value.getTime() : Date.parse(String(value));
+    if (Number.isNaN(ts)) {
+      return '-';
+    }
+
+    return timeFormatter.format(ts);
+  };
+
+  const getRestaurantAvailability = (now = new Date()) => {
+    const openTime = new Date(now);
+    openTime.setHours(BUSINESS_HOURS.openHour, 0, 0, 0);
+
+    const closeTime = new Date(now);
+    closeTime.setHours(BUSINESS_HOURS.closeHour, 0, 0, 0);
+
+    const isOpen = now >= openTime && now < closeTime;
+
+    if (isOpen) {
+      return {
+        isOpen: true,
+        badge: 'Open Now',
+        detail: `Accepting demo orders until ${formatClockTime(closeTime)}.`,
+        recovery: `You can place demo orders now. Service pauses at ${formatClockTime(closeTime)}.`
+      };
+    }
+
+    const nextOpen = new Date(openTime);
+    if (now >= closeTime) {
+      nextOpen.setDate(nextOpen.getDate() + 1);
+    }
+
+    return {
+      isOpen: false,
+      badge: 'Closed Now',
+      detail: `Demo checkout resumes at ${formatClockTime(nextOpen)}.`,
+      recovery:
+        now < openTime
+          ? `The kitchen opens today at ${formatClockTime(nextOpen)}.`
+          : `The kitchen reopens tomorrow at ${formatClockTime(nextOpen)}.`
+    };
+  };
+
+  const getEstimateDetails = (serviceType, itemCount = getCartCount()) => {
+    if (!serviceType || !itemCount) {
+      return {
+        label: itemCount
+          ? 'Choose a service type to see the estimated ready time.'
+          : 'Add items to see an estimated ready time.'
+      };
+    }
+
+    const baseMinutes = serviceType === 'dine-in' ? 28 : 18;
+    const extraMinutes = Math.max(0, itemCount - 1) * 3;
+    const totalMinutes = Math.min(baseMinutes + extraMinutes, 65);
+    const readyAt = new Date(Date.now() + totalMinutes * 60000);
+    const serviceLabel = serviceType === 'dine-in' ? 'Table ready' : 'Pickup ready';
+
+    return {
+      totalMinutes,
+      readyAt: readyAt.toISOString(),
+      label: `${serviceLabel} around ${formatClockTime(readyAt)} (${totalMinutes} min).`
+    };
+  };
+
+  const renderCheckoutBusinessStatus = () => {
+    const availability = getRestaurantAvailability();
+    const estimate = getEstimateDetails(getSelectedServiceType());
+    const targets = [
+      [dom.cartStatusBadge, dom.cartStatusCopy],
+      [dom.reviewStatusBadge, dom.reviewStatusCopy]
+    ];
+
+    targets.forEach(([badge, copy]) => {
+      if (!badge || !copy) {
+        return;
+      }
+
+      badge.textContent = availability.badge;
+      badge.classList.toggle('is-open', availability.isOpen);
+      badge.classList.toggle('is-closed', !availability.isOpen);
+      copy.textContent = availability.isOpen ? availability.detail : availability.recovery;
+    });
+
+    if (dom.reviewEstimateCopy) {
+      dom.reviewEstimateCopy.textContent = availability.isOpen
+        ? estimate.label
+        : `Checkout is paused while closed. ${availability.recovery}`;
+    }
   };
 
   const clearExpiredOrderGuards = () => {
@@ -239,11 +338,13 @@
     });
 
     setCheckoutDraftStatus('Checkout details saved on this device.');
+    renderCheckoutBusinessStatus();
   };
 
   const clearCheckoutDraft = () => {
     storage.remove(STORAGE_KEYS.checkoutDraft);
     setCheckoutDraftStatus('Checkout details save automatically on this device.');
+    renderCheckoutBusinessStatus();
   };
 
   const restoreCheckoutDraft = () => {
@@ -358,6 +459,7 @@
   const buildOrderRecord = checkoutData => {
     const placedAt = Date.now();
     const totals = getCartTotals();
+    const estimate = getEstimateDetails(checkoutData.serviceType);
 
     return {
       orderNumber: generateOrderNumber(placedAt),
@@ -375,7 +477,9 @@
       })),
       subtotal: totals.subtotal,
       service: totals.service,
-      total: totals.total
+      total: totals.total,
+      readyAt: estimate.readyAt || '',
+      readyLabel: estimate.label
     };
   };
 
@@ -437,6 +541,7 @@
       !dom.receiptServiceType ||
       !dom.receiptCustomerName ||
       !dom.receiptPhone ||
+      !dom.receiptReadyAt ||
       !dom.receiptNotes ||
       !dom.receiptItems ||
       !dom.receiptSubtotal ||
@@ -453,6 +558,7 @@
     dom.receiptServiceType.textContent = toTitleCase(order.serviceType);
     dom.receiptCustomerName.textContent = order.customerName;
     dom.receiptPhone.textContent = order.phone;
+    dom.receiptReadyAt.textContent = order.readyAt ? formatClockTime(order.readyAt) : order.readyLabel;
     dom.receiptNotes.textContent = order.notes || 'No notes provided.';
 
     const fragment = document.createDocumentFragment();
@@ -615,22 +721,30 @@
   const syncCheckoutActions = () => {
     const hasItems = getCartCount() > 0;
     const isBusy = state.isSubmittingOrder;
+    const availability = getRestaurantAvailability();
+    const canCheckout = hasItems && availability.isOpen && !isBusy;
 
     if (dom.checkoutBtn) {
-      dom.checkoutBtn.disabled = !hasItems || isBusy;
+      dom.checkoutBtn.disabled = !canCheckout;
       dom.checkoutBtn.setAttribute('aria-disabled', String(dom.checkoutBtn.disabled));
-      dom.checkoutBtn.textContent = isBusy ? 'Placing Demo Order...' : 'Review Order';
+      dom.checkoutBtn.textContent = isBusy
+        ? 'Placing Demo Order...'
+        : availability.isOpen
+          ? 'Review Order'
+          : 'Closed Now';
     }
 
     if (dom.reviewConfirmBtn) {
-      dom.reviewConfirmBtn.disabled = !hasItems || isBusy;
+      dom.reviewConfirmBtn.disabled = !canCheckout;
       dom.reviewConfirmBtn.setAttribute(
         'aria-disabled',
         String(dom.reviewConfirmBtn.disabled)
       );
       dom.reviewConfirmBtn.textContent = isBusy
         ? 'Placing Demo Order...'
-        : 'Place Demo Order';
+        : availability.isOpen
+          ? 'Place Demo Order'
+          : 'Closed Now';
     }
 
     if (dom.reviewBackBtn) {
@@ -643,6 +757,8 @@
         field.disabled = isBusy;
       });
     }
+
+    renderCheckoutBusinessStatus();
   };
 
   const renderReviewSummary = () => {
@@ -1556,6 +1672,13 @@
           return;
         }
 
+        const availability = getRestaurantAvailability();
+        if (!availability.isOpen) {
+          renderCheckoutBusinessStatus();
+          toast(`Checkout is unavailable right now. ${availability.recovery}`, 'error');
+          return;
+        }
+
         const cartWasUpdated = syncCartWithCurrentMenu();
         if (cartWasUpdated) {
           renderCart();
@@ -1663,6 +1786,13 @@
     dom.reviewsSlider.addEventListener('focusout', resumeMarquee);
   };
 
+  const initBusinessClock = () => {
+    renderCheckoutBusinessStatus();
+    window.setInterval(() => {
+      syncCheckoutActions();
+    }, 60000);
+  };
+
   const initModalEvents = () => {
     if (dom.floatingCartBtn) {
       dom.floatingCartBtn.addEventListener('click', () => openModal('cart'));
@@ -1738,6 +1868,14 @@
 
         if (!getCartCount()) {
           toast('Your cart is empty', 'error');
+          syncCheckoutActions();
+          return;
+        }
+
+        const availability = getRestaurantAvailability();
+        if (!availability.isOpen) {
+          renderCheckoutBusinessStatus();
+          toast(`Demo checkout is closed right now. ${availability.recovery}`, 'error');
           syncCheckoutActions();
           return;
         }
@@ -1823,6 +1961,8 @@
     dom.cartService = select('#cart-service');
     dom.cartTotal = select('#cart-total');
     dom.checkoutBtn = select('#checkout-btn');
+    dom.cartStatusBadge = select('#cart-status-badge');
+    dom.cartStatusCopy = select('#cart-status-copy');
 
     dom.previewModal = select('#preview-modal');
     dom.previewTitle = select('#preview-title');
@@ -1841,6 +1981,9 @@
     dom.checkoutNotes = select('#checkout-notes');
     dom.checkoutServiceGroup = select('#checkout-service-group');
     dom.checkoutDraftStatus = select('#checkout-draft-status');
+    dom.reviewStatusBadge = select('#review-status-badge');
+    dom.reviewStatusCopy = select('#review-status-copy');
+    dom.reviewEstimateCopy = select('#review-estimate-copy');
     dom.reviewItems = select('#review-items');
     dom.reviewItemCount = select('#review-item-count');
     dom.reviewSubtotal = select('#review-subtotal');
@@ -1856,6 +1999,7 @@
     dom.receiptServiceType = select('#receipt-service-type');
     dom.receiptCustomerName = select('#receipt-customer-name');
     dom.receiptPhone = select('#receipt-phone');
+    dom.receiptReadyAt = select('#receipt-ready-at');
     dom.receiptNotes = select('#receipt-notes');
     dom.receiptItems = select('#receipt-items');
     dom.receiptSubtotal = select('#receipt-subtotal');
@@ -1894,6 +2038,7 @@
     initModalEvents();
     initForms();
     initReviews();
+    initBusinessClock();
 
     await initMenu();
 

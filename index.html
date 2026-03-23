@@ -468,6 +468,15 @@
           <strong>Demo mode:</strong> Review your order before confirming it.
           Online payment is not active on this site yet.
         </p>
+        <div class="checkout-status-card" aria-live="polite">
+          <div class="status-row">
+            <span id="cart-status-badge" class="status-badge">Checking hours</span>
+            <span class="status-hours">Open daily: 8:00 AM - 11:00 PM</span>
+          </div>
+          <p id="cart-status-copy" class="status-copy">
+            Checking restaurant availability for demo checkout.
+          </p>
+        </div>
         <section class="order-history-shell" aria-labelledby="order-history-title">
           <div class="history-head">
             <div>
@@ -516,6 +525,18 @@
         <p id="checkout-draft-status" class="draft-status" aria-live="polite">
           Checkout details save automatically on this device.
         </p>
+        <div class="checkout-status-card" aria-live="polite">
+          <div class="status-row">
+            <span id="review-status-badge" class="status-badge">Checking hours</span>
+            <span class="status-hours">Open daily: 8:00 AM - 11:00 PM</span>
+          </div>
+          <p id="review-status-copy" class="status-copy">
+            Checking restaurant availability for demo checkout.
+          </p>
+          <p id="review-estimate-copy" class="status-copy status-estimate">
+            Choose a service type to see the estimated ready time.
+          </p>
+        </div>
 
         <form id="checkout-form" novalidate>
           <div class="checkout-fields">
@@ -658,6 +679,10 @@
           <div>
             <span>Phone</span>
             <strong id="receipt-phone">-</strong>
+          </div>
+          <div>
+            <span>Ready By</span>
+            <strong id="receipt-ready-at">-</strong>
           </div>
         </div>
 
