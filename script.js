@@ -18,7 +18,8 @@
     searchQuery: '',
     previewItem: null,
     previewQty: 1,
-    reviewIndex: 0
+    reviewIndex: 0,
+    isSubmittingOrder: false
   };
 
   const reviews = [
@@ -81,6 +82,17 @@
   const calculateSubtotal = () =>
     state.cart.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
 
+  const getCartTotals = () => {
+    const subtotal = calculateSubtotal();
+    const service = subtotal * SERVICE_RATE;
+
+    return {
+      subtotal,
+      service,
+      total: subtotal + service
+    };
+  };
+
   const saveCart = () => {
     storage.set(STORAGE_KEYS.cart, state.cart);
   };
@@ -109,8 +121,24 @@
     document.body.classList.toggle('no-scroll', Boolean(hasOpenModal));
   };
 
+  const getModal = type => {
+    if (type === 'cart') {
+      return dom.cartModal;
+    }
+
+    if (type === 'preview') {
+      return dom.previewModal;
+    }
+
+    if (type === 'review') {
+      return dom.reviewModal;
+    }
+
+    return null;
+  };
+
   const openModal = type => {
-    const modal = type === 'cart' ? dom.cartModal : dom.previewModal;
+    const modal = getModal(type);
     if (!modal) {
       return;
     }
@@ -126,10 +154,14 @@
     if (type === 'preview' && dom.previewAddBtn) {
       dom.previewAddBtn.focus();
     }
+
+    if (type === 'review' && dom.reviewConfirmBtn) {
+      dom.reviewConfirmBtn.focus();
+    }
   };
 
-  const closeModal = type => {
-    const modal = type === 'cart' ? dom.cartModal : dom.previewModal;
+  const closeModal = (type, { restoreFocus = true } = {}) => {
+    const modal = getModal(type);
     if (!modal) {
       return;
     }
@@ -140,6 +172,12 @@
 
     if (type === 'cart' && dom.floatingCartBtn) {
       dom.floatingCartBtn.setAttribute('aria-expanded', 'false');
+      if (restoreFocus) {
+        dom.floatingCartBtn.focus();
+      }
+    }
+
+    if (type === 'review' && restoreFocus && dom.floatingCartBtn) {
       dom.floatingCartBtn.focus();
     }
   };
@@ -171,15 +209,98 @@
     dom.floatingCartBtn.classList.add('bump');
   };
 
+  const syncCheckoutActions = () => {
+    const hasItems = getCartCount() > 0;
+    const isBusy = state.isSubmittingOrder;
+
+    if (dom.checkoutBtn) {
+      dom.checkoutBtn.disabled = !hasItems || isBusy;
+      dom.checkoutBtn.setAttribute('aria-disabled', String(dom.checkoutBtn.disabled));
+      dom.checkoutBtn.textContent = isBusy ? 'Placing Demo Order...' : 'Review Order';
+    }
+
+    if (dom.reviewConfirmBtn) {
+      dom.reviewConfirmBtn.disabled = !hasItems || isBusy;
+      dom.reviewConfirmBtn.setAttribute(
+        'aria-disabled',
+        String(dom.reviewConfirmBtn.disabled)
+      );
+      dom.reviewConfirmBtn.textContent = isBusy
+        ? 'Placing Demo Order...'
+        : 'Place Demo Order';
+    }
+
+    if (dom.reviewBackBtn) {
+      dom.reviewBackBtn.disabled = isBusy;
+      dom.reviewBackBtn.setAttribute('aria-disabled', String(dom.reviewBackBtn.disabled));
+    }
+  };
+
+  const renderReviewSummary = () => {
+    if (
+      !dom.reviewItems ||
+      !dom.reviewItemCount ||
+      !dom.reviewSubtotal ||
+      !dom.reviewService ||
+      !dom.reviewTotal
+    ) {
+      return;
+    }
+
+    const count = getCartCount();
+    const { subtotal, service, total } = getCartTotals();
+
+    dom.reviewItemCount.textContent =
+      count === 1 ? '1 item in your demo order' : `${count} items in your demo order`;
+
+    if (count === 0) {
+      dom.reviewItems.innerHTML =
+        '<div class="review-empty"><p>Your cart is empty. Add dishes before reviewing your order.</p></div>';
+      dom.reviewSubtotal.textContent = formatMoney(0);
+      dom.reviewService.textContent = formatMoney(0);
+      dom.reviewTotal.textContent = formatMoney(0);
+      syncCheckoutActions();
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+
+    state.cart.forEach(item => {
+      const row = document.createElement('div');
+      row.className = 'review-item-row';
+
+      const copy = document.createElement('div');
+      copy.className = 'review-item-copy';
+
+      const title = document.createElement('strong');
+      title.textContent = item.name;
+
+      const meta = document.createElement('p');
+      meta.className = 'review-item-meta';
+      meta.textContent = `${item.quantity} x ${formatMoney(item.unitPrice)}`;
+
+      const lineTotal = document.createElement('strong');
+      lineTotal.textContent = formatMoney(item.quantity * item.unitPrice);
+
+      copy.append(title, meta);
+      row.append(copy, lineTotal);
+      fragment.appendChild(row);
+    });
+
+    dom.reviewItems.replaceChildren(fragment);
+    dom.reviewSubtotal.textContent = formatMoney(subtotal);
+    dom.reviewService.textContent = formatMoney(service);
+    dom.reviewTotal.textContent = formatMoney(total);
+    syncCheckoutActions();
+  };
+
   const renderCart = () => {
     if (!dom.cartItems || !dom.cartCountBadge || !dom.cartSubtotal || !dom.cartService || !dom.cartTotal) {
       return;
     }
 
     const count = getCartCount();
-    const subtotal = calculateSubtotal();
-    const service = subtotal * SERVICE_RATE;
-    const total = subtotal + service;
+    const { subtotal, service, total } = getCartTotals();
 
     dom.cartCountBadge.textContent = String(count);
 
@@ -189,6 +310,7 @@
       dom.cartSubtotal.textContent = formatMoney(0);
       dom.cartService.textContent = formatMoney(0);
       dom.cartTotal.textContent = formatMoney(0);
+      renderReviewSummary();
       return;
     }
 
@@ -251,6 +373,7 @@
     dom.cartSubtotal.textContent = formatMoney(subtotal);
     dom.cartService.textContent = formatMoney(service);
     dom.cartTotal.textContent = formatMoney(total);
+    renderReviewSummary();
   };
 
   const upsertCartItem = (menuItem, quantity = 1) => {
@@ -977,7 +1100,11 @@
       }
 
       const type = closeTarget.dataset.closeModal;
-      if (type === 'cart' || type === 'preview') {
+      if (type === 'review' && state.isSubmittingOrder) {
+        return;
+      }
+
+      if (type === 'cart' || type === 'preview' || type === 'review') {
         closeModal(type);
       }
     });
@@ -985,6 +1112,13 @@
     document.addEventListener('keydown', event => {
       if (event.key !== 'Escape') {
         return;
+      }
+
+      if (dom.reviewModal && dom.reviewModal.classList.contains('open')) {
+        if (state.isSubmittingOrder) {
+          return;
+        }
+        closeModal('review');
       }
 
       if (dom.previewModal && dom.previewModal.classList.contains('open')) {
@@ -1015,25 +1149,55 @@
 
     if (dom.checkoutBtn) {
       dom.checkoutBtn.addEventListener('click', () => {
-        const itemsCount = getCartCount();
-
-        if (!itemsCount) {
-          toast('Your cart is empty', 'error');
+        if (state.isSubmittingOrder) {
           return;
         }
 
-        dom.checkoutBtn.disabled = true;
-        dom.checkoutBtn.textContent = 'Processing...';
+        if (!getCartCount()) {
+          toast('Your cart is empty', 'error');
+          syncCheckoutActions();
+          return;
+        }
+
+        renderReviewSummary();
+        closeModal('cart', { restoreFocus: false });
+        openModal('review');
+      });
+    }
+
+    if (dom.reviewBackBtn) {
+      dom.reviewBackBtn.addEventListener('click', () => {
+        if (state.isSubmittingOrder) {
+          return;
+        }
+
+        closeModal('review', { restoreFocus: false });
+        openModal('cart');
+      });
+    }
+
+    if (dom.reviewConfirmBtn) {
+      dom.reviewConfirmBtn.addEventListener('click', () => {
+        if (state.isSubmittingOrder) {
+          return;
+        }
+
+        if (!getCartCount()) {
+          toast('Your cart is empty', 'error');
+          renderReviewSummary();
+          return;
+        }
+
+        state.isSubmittingOrder = true;
+        syncCheckoutActions();
 
         window.setTimeout(() => {
+          state.isSubmittingOrder = false;
           state.cart = [];
           saveCart();
           renderCart();
-          closeModal('cart');
-          toast('Order placed successfully', 'success');
-
-          dom.checkoutBtn.disabled = false;
-          dom.checkoutBtn.textContent = 'Checkout';
+          closeModal('review', { restoreFocus: false });
+          toast('Demo order confirmed locally. No payment was charged.', 'success');
         }, 700);
       });
     }
@@ -1081,6 +1245,15 @@
     dom.previewQtyDec = select('#preview-qty-dec');
     dom.previewAddBtn = select('#preview-add-btn');
 
+    dom.reviewModal = select('#review-modal');
+    dom.reviewItems = select('#review-items');
+    dom.reviewItemCount = select('#review-item-count');
+    dom.reviewSubtotal = select('#review-subtotal');
+    dom.reviewService = select('#review-service');
+    dom.reviewTotal = select('#review-total');
+    dom.reviewBackBtn = select('#review-back-btn');
+    dom.reviewConfirmBtn = select('#review-confirm-btn');
+
     dom.toastContainer = select('#toast-container');
 
     dom.reservationForm = select('#reservation-form');
@@ -1102,6 +1275,7 @@
 
     restoreCart();
     renderCart();
+    syncCheckoutActions();
 
     initDelegatedEvents();
     initModalEvents();

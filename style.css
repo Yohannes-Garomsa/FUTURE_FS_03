@@ -603,6 +603,15 @@ h3 {
   outline: none;
 }
 
+.btn:disabled,
+.btn[aria-disabled='true'] {
+  cursor: not-allowed;
+  transform: none;
+  filter: saturate(0.7);
+  opacity: 0.64;
+  box-shadow: none;
+}
+
 .btn-primary {
   background: linear-gradient(
     132deg,
@@ -1519,6 +1528,76 @@ form {
   font-weight: 700;
 }
 
+.checkout-note {
+  margin: 0 0 var(--space-2);
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid color-mix(in oklab, var(--primary) 24%, var(--line) 76%);
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in oklab, var(--surface) 78%, var(--accent-soft) 22%),
+      color-mix(in oklab, var(--surface) 90%, transparent)
+    );
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.checkout-note strong {
+  color: var(--text);
+}
+
+.review-panel .eyebrow {
+  margin-bottom: 4px;
+}
+
+.review-meta {
+  margin-bottom: 10px;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.review-items {
+  display: grid;
+  gap: 10px;
+  margin-bottom: var(--space-2);
+}
+
+.review-item-row,
+.review-empty {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+}
+
+.review-item-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.review-item-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.review-item-meta,
+.review-empty p {
+  color: var(--muted);
+}
+
+.modal-actions {
+  display: grid;
+  gap: 10px;
+  margin-top: var(--space-2);
+}
+
+.modal-actions .btn {
+  width: 100%;
+}
+
 .preview-panel img {
   width: 100%;
   border-radius: 12px;
@@ -1973,6 +2052,18 @@ body.dark .modal-panel {
     );
 }
 
+body.dark .checkout-note,
+body.dark .review-item-row,
+body.dark .review-empty {
+  border-color: color-mix(in oklab, var(--primary) 40%, var(--line) 60%);
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, #17110d 86%, var(--surface) 14%),
+      color-mix(in oklab, #20160f 92%, var(--surface) 8%)
+    );
+}
+
 body.dark .site-footer {
   border-top-color: color-mix(in oklab, var(--primary) 38%, var(--line) 62%);
   background:
@@ -1985,6 +2076,10 @@ body.dark .site-footer {
 }
 
 @media (min-width: 760px) {
+  .modal-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .nav-menu {
     position: static;
     opacity: 1;

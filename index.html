@@ -464,9 +464,80 @@
             <span>Total</span><strong id="cart-total">$0.00</strong>
           </div>
         </div>
+        <p class="checkout-note">
+          <strong>Demo mode:</strong> Review your order before confirming it.
+          Online payment is not active on this site yet.
+        </p>
         <button id="checkout-btn" type="button" class="btn btn-primary full">
-          Checkout
+          Review Order
         </button>
+      </div>
+    </div>
+
+    <div
+      id="review-modal"
+      class="modal"
+      aria-hidden="true"
+      role="dialog"
+      aria-label="Review order"
+    >
+      <div class="modal-backdrop" data-close-modal="review"></div>
+      <div class="modal-panel glass-card review-panel">
+        <div class="modal-head">
+          <div>
+            <p class="eyebrow">Final Check</p>
+            <h3>Review Your Demo Order</h3>
+          </div>
+          <button
+            type="button"
+            class="icon-btn"
+            data-close-modal="review"
+            aria-label="Close order review"
+          >
+            ✕
+          </button>
+        </div>
+
+        <p class="checkout-note">
+          <strong>No charge will happen:</strong> this review step confirms the
+          order flow locally only. Connect a backend and payment provider before
+          using it for real guests.
+        </p>
+
+        <p id="review-item-count" class="review-meta" aria-live="polite">
+          0 items in your demo order
+        </p>
+
+        <div id="review-items" class="review-items"></div>
+
+        <div class="cart-summary review-summary">
+          <div>
+            <span>Subtotal</span><strong id="review-subtotal">$0.00</strong>
+          </div>
+          <div>
+            <span>Service (10%)</span><strong id="review-service">$0.00</strong>
+          </div>
+          <div class="total-row">
+            <span>Total</span><strong id="review-total">$0.00</strong>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button
+            id="review-back-btn"
+            type="button"
+            class="btn btn-secondary"
+          >
+            Back to Cart
+          </button>
+          <button
+            id="review-confirm-btn"
+            type="button"
+            class="btn btn-primary"
+          >
+            Place Demo Order
+          </button>
+        </div>
       </div>
     </div>
 
