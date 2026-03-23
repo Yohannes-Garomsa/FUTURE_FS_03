@@ -1721,6 +1721,15 @@ form {
   text-align: left;
 }
 
+.history-card:focus-visible,
+.service-option:focus-visible,
+.qty-btn:focus-visible,
+.remove-btn:focus-visible,
+.icon-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 24%, transparent);
+}
+
 .history-card-copy {
   display: grid;
   gap: 4px;
@@ -2441,6 +2450,35 @@ body.dark .site-footer {
 
   .about-features {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-panel {
+    width: min(96vw, 520px);
+    padding: 18px 16px;
+  }
+
+  .history-head,
+  .status-row,
+  .history-card,
+  .review-item-row,
+  .receipt-item-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-copy {
+    text-align: left;
+  }
+
+  .history-card-action {
+    white-space: normal;
+  }
+
+  .receipt-order-number {
+    width: 100%;
+    text-align: center;
   }
 }
 

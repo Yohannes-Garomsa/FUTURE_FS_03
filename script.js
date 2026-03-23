@@ -32,7 +32,8 @@
     isSubmittingOrder: false,
     shouldRestoreReview: false,
     orderHistory: [],
-    activeReceipt: null
+    activeReceipt: null,
+    modalReturnFocus: {}
   };
 
   const reviews = [
@@ -638,10 +639,57 @@
     return null;
   };
 
+  const getFocusableElements = modal => {
+    if (!modal) {
+      return [];
+    }
+
+    return Array.from(
+      modal.querySelectorAll(
+        'button:not([disabled]), [href], input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter(
+      element => element instanceof HTMLElement && !element.hasAttribute('hidden')
+    );
+  };
+
+  const getPreferredModalFocusTarget = type => {
+    if (type === 'cart') {
+      return dom.checkoutBtn || null;
+    }
+
+    if (type === 'preview') {
+      return dom.previewAddBtn || null;
+    }
+
+    if (type === 'review') {
+      const invalidField = dom.checkoutForm
+        ? dom.checkoutForm.querySelector('.invalid')
+        : null;
+      return invalidField || dom.checkoutName || dom.reviewConfirmBtn || null;
+    }
+
+    if (type === 'receipt') {
+      return dom.receiptDoneBtn || null;
+    }
+
+    return null;
+  };
+
+  const getOpenModal = () => {
+    const openModalEl = document.querySelector('.modal.open');
+    return openModalEl instanceof HTMLElement ? openModalEl : null;
+  };
+
   const openModal = type => {
     const modal = getModal(type);
     if (!modal) {
       return;
+    }
+
+    const activeElement = document.activeElement;
+    if (activeElement instanceof HTMLElement) {
+      state.modalReturnFocus[type] = activeElement;
     }
 
     modal.classList.add('open');
@@ -652,17 +700,15 @@
       dom.floatingCartBtn.setAttribute('aria-expanded', 'true');
     }
 
-    if (type === 'preview' && dom.previewAddBtn) {
-      dom.previewAddBtn.focus();
-    }
+    const preferredTarget = getPreferredModalFocusTarget(type);
+    const fallbackTarget = getFocusableElements(modal)[0] || modal.querySelector('.modal-panel');
+    const focusTarget = preferredTarget || fallbackTarget;
 
-    if (type === 'review' && dom.reviewConfirmBtn) {
-      dom.reviewConfirmBtn.focus();
-    }
-
-    if (type === 'receipt' && dom.receiptDoneBtn) {
-      dom.receiptDoneBtn.focus();
-    }
+    window.requestAnimationFrame(() => {
+      if (focusTarget instanceof HTMLElement) {
+        focusTarget.focus();
+      }
+    });
   };
 
   const closeModal = (type, { restoreFocus = true } = {}) => {
@@ -675,20 +721,36 @@
     modal.setAttribute('aria-hidden', 'true');
     setBodyScrollLock();
 
+    const returnFocusTarget = state.modalReturnFocus[type];
+
     if (type === 'cart' && dom.floatingCartBtn) {
       dom.floatingCartBtn.setAttribute('aria-expanded', 'false');
       if (restoreFocus) {
-        dom.floatingCartBtn.focus();
+        if (returnFocusTarget instanceof HTMLElement) {
+          returnFocusTarget.focus();
+        } else {
+          dom.floatingCartBtn.focus();
+        }
       }
     }
 
     if (type === 'review' && restoreFocus && dom.floatingCartBtn) {
-      dom.floatingCartBtn.focus();
+      if (returnFocusTarget instanceof HTMLElement) {
+        returnFocusTarget.focus();
+      } else {
+        dom.floatingCartBtn.focus();
+      }
     }
 
     if (type === 'receipt' && restoreFocus && dom.floatingCartBtn) {
-      dom.floatingCartBtn.focus();
+      if (returnFocusTarget instanceof HTMLElement) {
+        returnFocusTarget.focus();
+      } else {
+        dom.floatingCartBtn.focus();
+      }
     }
+
+    delete state.modalReturnFocus[type];
   };
 
   const toast = (message, type = 'success') => {
@@ -1521,6 +1583,27 @@
     });
   };
 
+  const focusFirstCheckoutIssue = serviceInputs => {
+    if (!dom.checkoutForm) {
+      return;
+    }
+
+    const invalidField = dom.checkoutForm.querySelector('.invalid');
+    if (invalidField instanceof HTMLElement) {
+      invalidField.focus();
+      return;
+    }
+
+    if (dom.checkoutServiceGroup && dom.checkoutServiceGroup.classList.contains('invalid')) {
+      const firstRadio = serviceInputs.find(
+        radio => radio instanceof HTMLInputElement
+      );
+      if (firstRadio) {
+        firstRadio.focus();
+      }
+    }
+  };
+
   const initForms = () => {
     if (dom.reservationForm) {
       const reservationRules = {
@@ -1695,6 +1778,7 @@
 
         if (!fieldValidity || !serviceValidity) {
           toast('Please complete the checkout details before placing the demo order.', 'error');
+          focusFirstCheckoutIssue(serviceInputs);
           return;
         }
 
@@ -1818,6 +1902,36 @@
     });
 
     document.addEventListener('keydown', event => {
+      const openModal = getOpenModal();
+
+      if (event.key === 'Tab' && openModal) {
+        const focusable = getFocusableElements(openModal);
+        if (!focusable.length) {
+          return;
+        }
+
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        const active = document.activeElement;
+
+        if (!(active instanceof HTMLElement) || !openModal.contains(active)) {
+          event.preventDefault();
+          (event.shiftKey ? last : first).focus();
+          return;
+        }
+
+        if (event.shiftKey && active === first) {
+          event.preventDefault();
+          last.focus();
+          return;
+        }
+
+        if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+
       if (event.key !== 'Escape') {
         return;
       }
