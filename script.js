@@ -4,11 +4,16 @@
   const STORAGE_KEYS = {
     cart: 'golden-spoon-cart-v1',
     theme: 'golden-spoon-theme-v1',
-    reservations: 'golden-spoon-reservations-v1'
+    reservations: 'golden-spoon-reservations-v1',
+    checkoutDraft: 'golden-spoon-checkout-draft-v1',
+    submitLock: 'golden-spoon-submit-lock-v1',
+    recentOrder: 'golden-spoon-recent-order-v1'
   };
 
   const SERVICE_RATE = 0.1;
   const TOAST_DURATION = 2800;
+  const SUBMIT_LOCK_MS = 5000;
+  const RECENT_ORDER_WINDOW_MS = 15000;
 
   const state = {
     menu: [],
@@ -19,7 +24,8 @@
     previewItem: null,
     previewQty: 1,
     reviewIndex: 0,
-    isSubmittingOrder: false
+    isSubmittingOrder: false,
+    shouldRestoreReview: false
   };
 
   const reviews = [
@@ -65,6 +71,14 @@
       } catch (_error) {
         return false;
       }
+    },
+    remove(key) {
+      try {
+        localStorage.removeItem(key);
+        return true;
+      } catch (_error) {
+        return false;
+      }
     }
   };
 
@@ -91,6 +105,207 @@
       service,
       total: subtotal + service
     };
+  };
+
+  const getSelectedServiceType = () => {
+    if (!dom.checkoutForm) {
+      return '';
+    }
+
+    const selected = dom.checkoutForm.querySelector('input[name="service-type"]:checked');
+    return selected instanceof HTMLInputElement ? selected.value : '';
+  };
+
+  const getCheckoutDraftData = () => ({
+    customerName:
+      dom.checkoutName instanceof HTMLInputElement ? dom.checkoutName.value.trim() : '',
+    phone: dom.checkoutPhone instanceof HTMLInputElement ? dom.checkoutPhone.value.trim() : '',
+    serviceType: getSelectedServiceType(),
+    notes:
+      dom.checkoutNotes instanceof HTMLTextAreaElement ? dom.checkoutNotes.value.trim() : ''
+  });
+
+  const setCheckoutDraftStatus = message => {
+    if (!dom.checkoutDraftStatus) {
+      return;
+    }
+
+    dom.checkoutDraftStatus.textContent = message;
+  };
+
+  const clearExpiredOrderGuards = () => {
+    const now = Date.now();
+    const submitLock = storage.get(STORAGE_KEYS.submitLock, null);
+    if (submitLock && Number(submitLock.expiresAt) <= now) {
+      storage.remove(STORAGE_KEYS.submitLock);
+    }
+
+    const recentOrder = storage.get(STORAGE_KEYS.recentOrder, null);
+    if (recentOrder && Number(recentOrder.expiresAt) <= now) {
+      storage.remove(STORAGE_KEYS.recentOrder);
+    }
+  };
+
+  const getActiveSubmitLock = () => {
+    clearExpiredOrderGuards();
+    const lock = storage.get(STORAGE_KEYS.submitLock, null);
+
+    if (!lock || typeof lock !== 'object') {
+      return null;
+    }
+
+    return Number(lock.expiresAt) > Date.now() ? lock : null;
+  };
+
+  const getRecentOrderGuard = () => {
+    clearExpiredOrderGuards();
+    const guard = storage.get(STORAGE_KEYS.recentOrder, null);
+
+    if (!guard || typeof guard !== 'object') {
+      return null;
+    }
+
+    return Number(guard.expiresAt) > Date.now() ? guard : null;
+  };
+
+  const setSubmitLock = fingerprint => {
+    storage.set(STORAGE_KEYS.submitLock, {
+      fingerprint,
+      expiresAt: Date.now() + SUBMIT_LOCK_MS
+    });
+  };
+
+  const clearSubmitLock = () => {
+    storage.remove(STORAGE_KEYS.submitLock);
+  };
+
+  const rememberRecentOrder = fingerprint => {
+    storage.set(STORAGE_KEYS.recentOrder, {
+      fingerprint,
+      expiresAt: Date.now() + RECENT_ORDER_WINDOW_MS
+    });
+  };
+
+  const buildOrderFingerprint = (checkoutData, totals) =>
+    JSON.stringify({
+      customerName: checkoutData.customerName.toLowerCase(),
+      phone: checkoutData.phone.replace(/\s+/g, ''),
+      serviceType: checkoutData.serviceType,
+      notes: checkoutData.notes.toLowerCase(),
+      items: state.cart.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        unitPrice: Number(item.unitPrice.toFixed(2))
+      })),
+      total: Number(totals.total.toFixed(2))
+    });
+
+  const saveCheckoutDraft = () => {
+    if (!dom.checkoutForm) {
+      return;
+    }
+
+    const checkoutData = getCheckoutDraftData();
+    const hasDetails = Object.values(checkoutData).some(value => Boolean(value));
+    const reviewIsOpen = Boolean(dom.reviewModal && dom.reviewModal.classList.contains('open'));
+
+    if (!hasDetails && !reviewIsOpen) {
+      storage.remove(STORAGE_KEYS.checkoutDraft);
+      setCheckoutDraftStatus('Checkout details save automatically on this device.');
+      return;
+    }
+
+    storage.set(STORAGE_KEYS.checkoutDraft, {
+      ...checkoutData,
+      reviewIsOpen,
+      updatedAt: Date.now()
+    });
+
+    setCheckoutDraftStatus('Checkout details saved on this device.');
+  };
+
+  const clearCheckoutDraft = () => {
+    storage.remove(STORAGE_KEYS.checkoutDraft);
+    setCheckoutDraftStatus('Checkout details save automatically on this device.');
+  };
+
+  const restoreCheckoutDraft = () => {
+    if (!dom.checkoutForm) {
+      return;
+    }
+
+    const saved = storage.get(STORAGE_KEYS.checkoutDraft, null);
+    if (!saved || typeof saved !== 'object') {
+      setCheckoutDraftStatus('Checkout details save automatically on this device.');
+      return;
+    }
+
+    if (dom.checkoutName instanceof HTMLInputElement) {
+      dom.checkoutName.value = String(saved.customerName || '');
+    }
+
+    if (dom.checkoutPhone instanceof HTMLInputElement) {
+      dom.checkoutPhone.value = String(saved.phone || '');
+    }
+
+    if (dom.checkoutNotes instanceof HTMLTextAreaElement) {
+      dom.checkoutNotes.value = String(saved.notes || '');
+    }
+
+    const savedService = String(saved.serviceType || '');
+    if (savedService) {
+      dom.checkoutForm
+        .querySelectorAll('input[name="service-type"]')
+        .forEach(radio => {
+          if (radio instanceof HTMLInputElement) {
+            radio.checked = radio.value === savedService;
+          }
+        });
+    }
+
+    state.shouldRestoreReview = Boolean(saved.reviewIsOpen);
+    setCheckoutDraftStatus('Restored your unfinished checkout details on this device.');
+  };
+
+  const syncCartWithCurrentMenu = () => {
+    if (!state.menu.length || !state.cart.length) {
+      return false;
+    }
+
+    let changed = false;
+
+    state.cart = state.cart.map(item => {
+      const latest = state.menu.find(menuItem => menuItem.id === item.id);
+      if (!latest) {
+        return item;
+      }
+
+      const latestPrice = parsePrice(latest.price);
+      const nextItem = {
+        ...item,
+        name: latest.name,
+        price: latest.price,
+        unitPrice: latestPrice,
+        image: latest.image
+      };
+
+      if (
+        nextItem.name !== item.name ||
+        nextItem.price !== item.price ||
+        nextItem.unitPrice !== item.unitPrice ||
+        nextItem.image !== item.image
+      ) {
+        changed = true;
+      }
+
+      return nextItem;
+    });
+
+    if (changed) {
+      saveCart();
+    }
+
+    return changed;
   };
 
   const saveCart = () => {
@@ -316,6 +531,7 @@
       dom.cartSubtotal.textContent = formatMoney(0);
       dom.cartService.textContent = formatMoney(0);
       dom.cartTotal.textContent = formatMoney(0);
+      clearCheckoutDraft();
       renderReviewSummary();
       return;
     }
@@ -898,6 +1114,12 @@
         image: String(item.image || '')
       }));
 
+      const cartWasUpdated = syncCartWithCurrentMenu();
+      if (cartWasUpdated) {
+        renderCart();
+        toast('Cart totals refreshed from the latest menu.', 'success');
+      }
+
       setActiveFilterButton(state.activeFilter);
       applyFiltersAndRenderMenu();
     } catch (error) {
@@ -1111,10 +1333,12 @@
 
         const key = field.name;
         if (!checkoutRules[key]) {
+          saveCheckoutDraft();
           return;
         }
 
         validateField(field, checkoutRules[key]);
+        saveCheckoutDraft();
       });
 
       dom.checkoutForm.addEventListener('change', event => {
@@ -1128,6 +1352,7 @@
         }
 
         validateChoiceGroup(dom.checkoutServiceGroup, getServiceTypeInputs());
+        saveCheckoutDraft();
       });
 
       dom.checkoutForm.addEventListener('submit', event => {
@@ -1143,6 +1368,12 @@
           return;
         }
 
+        const cartWasUpdated = syncCartWithCurrentMenu();
+        if (cartWasUpdated) {
+          renderCart();
+          setCheckoutDraftStatus('Cart totals were refreshed from the latest menu.');
+        }
+
         const fields = Array.from(dom.checkoutForm.querySelectorAll('input, textarea'));
         const serviceInputs = getServiceTypeInputs();
         const fieldValidity = fields.every(field => {
@@ -1156,7 +1387,30 @@
           return;
         }
 
+        const checkoutData = getCheckoutDraftData();
+        const totals = getCartTotals();
+        const fingerprint = buildOrderFingerprint(checkoutData, totals);
+        const activeLock = getActiveSubmitLock();
+
+        if (activeLock) {
+          toast(
+            activeLock.fingerprint === fingerprint
+              ? 'This demo order is already being processed.'
+              : 'Please wait for the current order action to finish.',
+            'error'
+          );
+          return;
+        }
+
+        const recentOrder = getRecentOrderGuard();
+        if (recentOrder && recentOrder.fingerprint === fingerprint) {
+          toast('This demo order was just placed. Update the cart or details before trying again.', 'error');
+          return;
+        }
+
         state.isSubmittingOrder = true;
+        setSubmitLock(fingerprint);
+        saveCheckoutDraft();
         syncCheckoutActions();
 
         const selectedService = serviceInputs.find(radio => radio.checked);
@@ -1164,11 +1418,14 @@
 
         window.setTimeout(() => {
           state.isSubmittingOrder = false;
+          clearSubmitLock();
+          rememberRecentOrder(fingerprint);
           state.cart = [];
           saveCart();
           renderCart();
           dom.checkoutForm.reset();
           resetFormValidation(dom.checkoutForm);
+          clearCheckoutDraft();
           closeModal('review', { restoreFocus: false });
           toast(
             `Demo order for ${serviceLabel} confirmed locally. No payment was charged.`,
@@ -1231,6 +1488,9 @@
 
       if (type === 'cart' || type === 'preview' || type === 'review') {
         closeModal(type);
+        if (type === 'review') {
+          saveCheckoutDraft();
+        }
       }
     });
 
@@ -1244,6 +1504,7 @@
           return;
         }
         closeModal('review');
+        saveCheckoutDraft();
       }
 
       if (dom.previewModal && dom.previewModal.classList.contains('open')) {
@@ -1284,9 +1545,16 @@
           return;
         }
 
+        const cartWasUpdated = syncCartWithCurrentMenu();
+        if (cartWasUpdated) {
+          renderCart();
+          setCheckoutDraftStatus('Cart totals were refreshed from the latest menu.');
+        }
+
         renderReviewSummary();
         closeModal('cart', { restoreFocus: false });
         openModal('review');
+        saveCheckoutDraft();
       });
     }
 
@@ -1297,6 +1565,7 @@
         }
 
         closeModal('review', { restoreFocus: false });
+        saveCheckoutDraft();
         openModal('cart');
       });
     }
@@ -1347,7 +1616,11 @@
 
     dom.reviewModal = select('#review-modal');
     dom.checkoutForm = select('#checkout-form');
+    dom.checkoutName = select('#checkout-name');
+    dom.checkoutPhone = select('#checkout-phone');
+    dom.checkoutNotes = select('#checkout-notes');
     dom.checkoutServiceGroup = select('#checkout-service-group');
+    dom.checkoutDraftStatus = select('#checkout-draft-status');
     dom.reviewItems = select('#review-items');
     dom.reviewItemCount = select('#review-item-count');
     dom.reviewSubtotal = select('#review-subtotal');
@@ -1366,6 +1639,8 @@
 
   const init = async () => {
     cacheDom();
+    clearExpiredOrderGuards();
+    restoreCheckoutDraft();
 
     initTheme();
     initHeaderAndScrollUI();
@@ -1385,6 +1660,12 @@
     initReviews();
 
     await initMenu();
+
+    if (state.shouldRestoreReview && getCartCount()) {
+      renderReviewSummary();
+      openModal('review');
+      toast('Restored your unfinished checkout.', 'success');
+    }
 
     document.documentElement.classList.add('app-ready');
   };
