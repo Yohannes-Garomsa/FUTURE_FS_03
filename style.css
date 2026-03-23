@@ -1162,6 +1162,11 @@ form {
   gap: 12px;
 }
 
+.checkout-fields {
+  display: grid;
+  gap: 12px;
+}
+
 .form-group {
   display: grid;
   gap: 6px;
@@ -1201,6 +1206,61 @@ form {
   font-size: 0.82rem;
   font-weight: 600;
   min-height: 16px;
+}
+
+.checkout-service-group {
+  margin: 0;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in oklab, var(--surface) 92%, transparent);
+  display: grid;
+  gap: 10px;
+}
+
+.checkout-service-group legend {
+  padding: 0 6px;
+  color: var(--muted);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.checkout-service-options {
+  display: grid;
+  gap: 10px;
+}
+
+.service-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: color-mix(in oklab, var(--surface) 96%, transparent);
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.service-option:hover,
+.service-option:focus-within {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--primary) 42%, var(--line) 58%);
+  box-shadow: 0 10px 18px color-mix(in oklab, var(--primary) 10%, transparent);
+}
+
+.service-option input {
+  margin: 0;
+  accent-color: var(--primary);
+}
+
+.service-option span {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.checkout-service-group.invalid {
+  border-color: var(--danger);
 }
 
 .contact-details {
@@ -1989,6 +2049,7 @@ body.dark .btn-secondary {
 body.dark .search-wrap input,
 body.dark .form-group input,
 body.dark .form-group textarea,
+body.dark .service-option input,
 body.dark .qty-btn,
 body.dark .qty-control button {
   background: color-mix(in oklab, #16120f 88%, var(--surface) 12%);
@@ -2064,6 +2125,25 @@ body.dark .review-empty {
     );
 }
 
+body.dark .checkout-service-group,
+body.dark .service-option {
+  border-color: color-mix(in oklab, var(--primary) 40%, var(--line) 60%);
+  background:
+    linear-gradient(
+      150deg,
+      color-mix(in oklab, #17110d 86%, var(--surface) 14%),
+      color-mix(in oklab, #20160f 92%, var(--surface) 8%)
+    );
+}
+
+body.dark .checkout-service-group legend {
+  color: #c9b690;
+}
+
+body.dark .service-option span {
+  color: #f0dcbb;
+}
+
 body.dark .site-footer {
   border-top-color: color-mix(in oklab, var(--primary) 38%, var(--line) 62%);
   background:
@@ -2076,6 +2156,11 @@ body.dark .site-footer {
 }
 
 @media (min-width: 760px) {
+  .checkout-fields,
+  .checkout-service-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .modal-actions {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

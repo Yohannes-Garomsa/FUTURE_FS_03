@@ -234,6 +234,12 @@
       dom.reviewBackBtn.disabled = isBusy;
       dom.reviewBackBtn.setAttribute('aria-disabled', String(dom.reviewBackBtn.disabled));
     }
+
+    if (dom.checkoutForm) {
+      dom.checkoutForm.querySelectorAll('input, textarea').forEach(field => {
+        field.disabled = isBusy;
+      });
+    }
   };
 
   const renderReviewSummary = () => {
@@ -954,6 +960,41 @@
     return !message;
   };
 
+  const validateChoiceGroup = (group, radios, rules = { required: true }) => {
+    const error = group ? group.querySelector('.error-message') : null;
+    const hasSelection = radios.some(radio => radio.checked);
+    const message = rules.required && !hasSelection ? 'Please select a service type.' : '';
+
+    if (group) {
+      group.classList.toggle('invalid', Boolean(message));
+      group.setAttribute('aria-invalid', String(Boolean(message)));
+    }
+
+    radios.forEach(radio => {
+      radio.setAttribute('aria-invalid', String(Boolean(message)));
+    });
+
+    if (error) {
+      error.textContent = message;
+    }
+
+    return !message;
+  };
+
+  const resetFormValidation = form => {
+    if (!form) {
+      return;
+    }
+
+    form.querySelectorAll('.invalid').forEach(field => field.classList.remove('invalid'));
+    form
+      .querySelectorAll('[aria-invalid="true"]')
+      .forEach(field => field.setAttribute('aria-invalid', 'false'));
+    form.querySelectorAll('.error-message').forEach(node => {
+      node.textContent = '';
+    });
+  };
+
   const initForms = () => {
     if (dom.reservationForm) {
       const reservationRules = {
@@ -1050,6 +1091,90 @@
 
         dom.contactForm.reset();
         toast('Message sent. We will get back to you soon.', 'success');
+      });
+    }
+
+    if (dom.checkoutForm) {
+      const checkoutRules = {
+        'checkout-name': { required: true, min: 2 },
+        'checkout-phone': { required: true, phone: true }
+      };
+
+      const getServiceTypeInputs = () =>
+        Array.from(dom.checkoutForm.querySelectorAll('input[name="service-type"]'));
+
+      dom.checkoutForm.addEventListener('input', event => {
+        const field = event.target;
+        if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement)) {
+          return;
+        }
+
+        const key = field.name;
+        if (!checkoutRules[key]) {
+          return;
+        }
+
+        validateField(field, checkoutRules[key]);
+      });
+
+      dom.checkoutForm.addEventListener('change', event => {
+        const field = event.target;
+        if (!(field instanceof HTMLInputElement)) {
+          return;
+        }
+
+        if (field.name !== 'service-type') {
+          return;
+        }
+
+        validateChoiceGroup(dom.checkoutServiceGroup, getServiceTypeInputs());
+      });
+
+      dom.checkoutForm.addEventListener('submit', event => {
+        event.preventDefault();
+
+        if (state.isSubmittingOrder) {
+          return;
+        }
+
+        if (!getCartCount()) {
+          toast('Your cart is empty', 'error');
+          renderReviewSummary();
+          return;
+        }
+
+        const fields = Array.from(dom.checkoutForm.querySelectorAll('input, textarea'));
+        const serviceInputs = getServiceTypeInputs();
+        const fieldValidity = fields.every(field => {
+          const key = field.name;
+          return checkoutRules[key] ? validateField(field, checkoutRules[key]) : true;
+        });
+        const serviceValidity = validateChoiceGroup(dom.checkoutServiceGroup, serviceInputs);
+
+        if (!fieldValidity || !serviceValidity) {
+          toast('Please complete the checkout details before placing the demo order.', 'error');
+          return;
+        }
+
+        state.isSubmittingOrder = true;
+        syncCheckoutActions();
+
+        const selectedService = serviceInputs.find(radio => radio.checked);
+        const serviceLabel = selectedService ? selectedService.value : 'pickup';
+
+        window.setTimeout(() => {
+          state.isSubmittingOrder = false;
+          state.cart = [];
+          saveCart();
+          renderCart();
+          dom.checkoutForm.reset();
+          resetFormValidation(dom.checkoutForm);
+          closeModal('review', { restoreFocus: false });
+          toast(
+            `Demo order for ${serviceLabel} confirmed locally. No payment was charged.`,
+            'success'
+          );
+        }, 700);
       });
     }
   };
@@ -1176,31 +1301,6 @@
       });
     }
 
-    if (dom.reviewConfirmBtn) {
-      dom.reviewConfirmBtn.addEventListener('click', () => {
-        if (state.isSubmittingOrder) {
-          return;
-        }
-
-        if (!getCartCount()) {
-          toast('Your cart is empty', 'error');
-          renderReviewSummary();
-          return;
-        }
-
-        state.isSubmittingOrder = true;
-        syncCheckoutActions();
-
-        window.setTimeout(() => {
-          state.isSubmittingOrder = false;
-          state.cart = [];
-          saveCart();
-          renderCart();
-          closeModal('review', { restoreFocus: false });
-          toast('Demo order confirmed locally. No payment was charged.', 'success');
-        }, 700);
-      });
-    }
   };
 
   const initDelegatedEvents = () => {
@@ -1246,6 +1346,8 @@
     dom.previewAddBtn = select('#preview-add-btn');
 
     dom.reviewModal = select('#review-modal');
+    dom.checkoutForm = select('#checkout-form');
+    dom.checkoutServiceGroup = select('#checkout-service-group');
     dom.reviewItems = select('#review-items');
     dom.reviewItemCount = select('#review-item-count');
     dom.reviewSubtotal = select('#review-subtotal');

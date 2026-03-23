@@ -504,40 +504,102 @@
           using it for real guests.
         </p>
 
-        <p id="review-item-count" class="review-meta" aria-live="polite">
-          0 items in your demo order
-        </p>
+        <form id="checkout-form" novalidate>
+          <div class="checkout-fields">
+            <div class="form-group">
+              <label for="checkout-name">Customer Name</label>
+              <input
+                type="text"
+                id="checkout-name"
+                name="checkout-name"
+                placeholder="Enter your full name"
+                required
+              />
+              <p class="error-message" aria-live="polite"></p>
+            </div>
 
-        <div id="review-items" class="review-items"></div>
+            <div class="form-group">
+              <label for="checkout-phone">Phone Number</label>
+              <input
+                type="tel"
+                id="checkout-phone"
+                name="checkout-phone"
+                placeholder="+251 91 234 5678"
+                required
+              />
+              <p class="error-message" aria-live="polite"></p>
+            </div>
+          </div>
 
-        <div class="cart-summary review-summary">
-          <div>
-            <span>Subtotal</span><strong id="review-subtotal">$0.00</strong>
-          </div>
-          <div>
-            <span>Service (10%)</span><strong id="review-service">$0.00</strong>
-          </div>
-          <div class="total-row">
-            <span>Total</span><strong id="review-total">$0.00</strong>
-          </div>
-        </div>
+          <fieldset class="checkout-service-group" id="checkout-service-group">
+            <legend>Service Type</legend>
+            <div class="checkout-service-options">
+              <label class="service-option">
+                <input
+                  type="radio"
+                  name="service-type"
+                  value="pickup"
+                />
+                <span>Pickup</span>
+              </label>
+              <label class="service-option">
+                <input
+                  type="radio"
+                  name="service-type"
+                  value="dine-in"
+                />
+                <span>Dine-In</span>
+              </label>
+            </div>
+            <p class="error-message" aria-live="polite"></p>
+          </fieldset>
 
-        <div class="modal-actions">
-          <button
-            id="review-back-btn"
-            type="button"
-            class="btn btn-secondary"
-          >
-            Back to Cart
-          </button>
-          <button
-            id="review-confirm-btn"
-            type="button"
-            class="btn btn-primary"
-          >
-            Place Demo Order
-          </button>
-        </div>
+          <div class="form-group">
+            <label for="checkout-notes">Order Notes</label>
+            <textarea
+              id="checkout-notes"
+              name="checkout-notes"
+              rows="3"
+              placeholder="Optional notes for allergies, pickup timing, or table preference"
+            ></textarea>
+            <p class="error-message" aria-live="polite"></p>
+          </div>
+
+          <p id="review-item-count" class="review-meta" aria-live="polite">
+            0 items in your demo order
+          </p>
+
+          <div id="review-items" class="review-items"></div>
+
+          <div class="cart-summary review-summary">
+            <div>
+              <span>Subtotal</span><strong id="review-subtotal">$0.00</strong>
+            </div>
+            <div>
+              <span>Service (10%)</span><strong id="review-service">$0.00</strong>
+            </div>
+            <div class="total-row">
+              <span>Total</span><strong id="review-total">$0.00</strong>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button
+              id="review-back-btn"
+              type="button"
+              class="btn btn-secondary"
+            >
+              Back to Cart
+            </button>
+            <button
+              id="review-confirm-btn"
+              type="submit"
+              class="btn btn-primary"
+            >
+              Place Demo Order
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
